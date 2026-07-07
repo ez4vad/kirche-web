@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Christengemeinde</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+  />
+</head>
+
+
+<body>
+
+  <header class="header">
+    <div class="logo">
+        <img src="images/logo.png" alt="Philadelphia Christengemeinde Bremen">
+    </div>
+
+    <button class="burger" id="burgerBtn">☰</button>
+
+    <nav class="mobile-menu" id="mobileMenu">
+      <a href="#">Главная</a>
+      <a href="#">О нас</a>
+      <a href="#">Служения</a>
+      <a href="#">Новости</a>
+      <a href="#">Контакты</a>
+    </nav>
+  </header>
+
+  <section class="hero-slider">
+  <div class="swiper cardSwiper">
+    <div class="swiper-wrapper">
+
+      <div class="swiper-slide hero-card">
+        <img src="images/slide1.jpg" alt="">
+        <span class="hero-tag">Обучение</span>
+
+        <div class="hero-info">
+          <h1>Путь роста</h1>
+          <p>Развиваемся в вере и служим вместе</p>
+          <a href="#" class="hero-btn">Подробнее</a>
+        </div>
+      </div>
+
+      <div class="swiper-slide hero-card">
+        <img src="images/slide1.jpg" alt="">
+        <span class="hero-tag">Служение</span>
+
+        <div class="hero-info">
+          <h1>Жизнь общины</h1>
+          <p>Встречи, события и новости церкви</p>
+          <a href="#" class="hero-btn">Подробнее</a>
+        </div>
+      </div>
+
+      <div class="swiper-slide hero-card">
+        <img src="images/slide1.jpg" alt="">
+        <span class="hero-tag">Семья</span>
+
+        <div class="hero-info">
+          <h1>Место для всех</h1>
+          <p>Добро пожаловать в Christengemeinde</p>
+          <a href="#" class="hero-btn">Подробнее</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div> -->
+    <div class="swiper-pagination"></div>
+  </div>
+</section>
+
+<section class="events">
+  <div class="section-head">
+    <h2>Ближайшие события</h2>
+    <a href="#">Все события →</a>
+  </div>
+
+  <div class="events-calendar">
+    <button class="day active">
+      <span>25</span>
+      <small>май</small>
+    </button>
+
+    <button class="day">
+      <span>26</span>
+      <small>май</small>
+    </button>
+
+    <button class="day">
+      <span>28</span>
+      <small>май</small>
+    </button>
+
+    <button class="day">
+      <span>30</span>
+      <small>май</small>
+    </button>
+  </div>
+
+  <div class="events-list">
+    <div class="event-item">
+      <div class="event-time">11:00</div>
+      <div>
+        <h3>Воскресное богослужение</h3>
+        <p>Главный зал</p>
+      </div>
+    </div>
+
+    <div class="event-item">
+      <div class="event-time">18:00</div>
+      <div>
+        <h3>Молодёжная встреча</h3>
+        <p>Молитвенный зал</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="videos">
+  <div class="section-head">
+    <h2>Последние видео</h2>
+    <a href="#">Все видео →</a>
+  </div>
+
+  <div class="videos-list">
+    <div class="video-card" data-video="4C3aYY2g-_Q">
+      <div class="video-preview">
+        <img src="https://img.youtube.com/vi/4C3aYY2g-_Q/hqdefault.jpg" alt="">
+        <button class="play-btn">▶</button>
+      </div>
+      <h3>Воскресное служение</h3>
+    </div>
+
+    <div class="video-card" data-video="4C3aYY2g-_Q">
+      <div class="video-preview">
+        <img src="https://img.youtube.com/vi/4C3aYY2g-_Q/hqdefault.jpg" alt="">
+        <button class="play-btn">▶</button>
+      </div>
+      <h3>Воскресное служение</h3>
+    </div>
+  </div>
+
+  <a class="all-videos-btn" href="#">Смотреть все видео</a>
+</section>
+
+<section class="contacts" id="contacts">
+  <div class="section-head">
+    <h2>Адрес</h2>
+  </div>
+
+  <div class="contact-card">
+    <h3>Kirche Philadelphia</h3>
+
+    <p>
+        Horner Heerstraße 28<br>
+        28359 Bremen
+    </p>
+  </div>
+
+<div class="map-box">
+    <iframe
+        src="https://www.openstreetmap.org/export/embed.html?bbox=8.8675%2C53.0956%2C8.8717%2C53.0979&layer=mapnik&marker=53.0967454%2C8.8695744"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+</div>
+</section>
+
+<div class="video-modal" id="videoModal">
+  <button class="video-close" id="videoClose">×</button>
+  <div class="video-modal-content" id="videoModalContent"></div>
+</div>
+
+
+  <footer class="footer">
+    <p>© 2026 Christengemeinde</p>
+  </footer>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
