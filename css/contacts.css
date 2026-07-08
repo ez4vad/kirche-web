@@ -1,0 +1,28 @@
+/* CONTACTS PAGE */
+
+.contacts-page {
+  padding-top: 80px;
+  background: var(--background);
+}
+
+.contacts-hero {
+  padding: 50px 20px;
+  background: linear-gradient(135deg, var(--section), var(--white));
+}
+
+.contacts-hero h1 {
+  font-size: 40px;
+  line-height: 1.05;
+  margin-bottom: 18px;
+  color: var(--text);
+}
+
+.contacts-hero p {
+  font-size: 17px;
+  line-height: 1.7;
+  color: #667085;
+}
+
+.contacts-full {
+  padding: 30px 20px 60px;
+}

@@ -16,7 +16,9 @@
 
   <header class="header">
     <div class="logo">
+      <a href="index.html">
         <img src="images/logo.png" alt="Philadelphia Christengemeinde Bremen">
+      </a>
     </div>
 
     <button class="burger" id="burgerBtn">☰</button>
@@ -24,46 +26,68 @@
     <nav class="mobile-menu" id="mobileMenu">
       <a href="#">Главная</a>
       <a href="about.html">О нас</a>
-      <a href="#">Служения</a>
+      <a href="services.html">Служения</a>
       <a href="#">Новости</a>
-      <a href="#">Контакты</a>
+      <a href="contacts.html">Контакты</a>
     </nav>
   </header>
 
-  <section class="hero-slider">
+ <section class="hero-slider">
   <div class="swiper cardSwiper">
     <div class="swiper-wrapper">
 
       <div class="swiper-slide hero-card">
-        <img src="images/slide1.jpg" alt="">
-        <span class="hero-tag">Обучение</span>
+        <img src="images/service-youth.jpg" alt="">
+        <span class="hero-tag">Молодёжь</span>
 
         <div class="hero-info">
-          <h1>Путь роста</h1>
-          <p>Развиваемся в вере и служим вместе</p>
-          <a href="#" class="hero-btn">Подробнее</a>
+          <h1>Молодёжное служение</h1>
+          <p>Пространство для дружбы, честных вопросов, веры и роста.</p>
+          <a href="service-youth.html" class="hero-btn">Подробнее</a>
         </div>
       </div>
 
       <div class="swiper-slide hero-card">
-        <img src="images/slide1.jpg" alt="">
-        <span class="hero-tag">Служение</span>
+        <img src="images/service-kids.jpg" alt="">
+        <span class="hero-tag">Дети</span>
 
         <div class="hero-info">
-          <h1>Жизнь общины</h1>
-          <p>Встречи, события и новости церкви</p>
-          <a href="#" class="hero-btn">Подробнее</a>
+          <h1>Детское служение</h1>
+          <p>Безопасная и тёплая атмосфера, где дети узнают о Боге.</p>
+          <a href="service-kids.html" class="hero-btn">Подробнее</a>
         </div>
       </div>
 
       <div class="swiper-slide hero-card">
-        <img src="images/slide1.jpg" alt="">
-        <span class="hero-tag">Семья</span>
+        <img src="images/service-worship.jpg" alt="">
+        <span class="hero-tag">Музыка</span>
 
         <div class="hero-info">
-          <h1>Место для всех</h1>
-          <p>Добро пожаловать в Christengemeinde</p>
-          <a href="#" class="hero-btn">Подробнее</a>
+          <h1>Прославление</h1>
+          <p>Служение поклонения через музыку, молитву и творчество.</p>
+          <a href="service-worship.html" class="hero-btn">Подробнее</a>
+        </div>
+      </div>
+
+      <div class="swiper-slide hero-card">
+        <img src="images/service-media.jpg" alt="">
+        <span class="hero-tag">Медиа</span>
+
+        <div class="hero-info">
+          <h1>Медиа-служение</h1>
+          <p>Фото, видео, трансляции и развитие сайта церкви.</p>
+          <a href="service-media.html" class="hero-btn">Подробнее</a>
+        </div>
+      </div>
+
+      <div class="swiper-slide hero-card">
+        <img src="images/service-kuche.jpg" alt="">
+        <span class="hero-tag">Забота</span>
+
+        <div class="hero-info">
+          <h1>Кухонное-служение</h1>
+          <p>Гостеприимство, тёплая атмосфера и забота о людях через совместные обеды и помощь на мероприятиях.</p>
+          <a href="service-kuche.html" class="hero-btn">Подробнее</a>
         </div>
       </div>
 
@@ -71,61 +95,46 @@
 
     <!-- <div class="swiper-button-prev"></div>
     <div class="swiper-button-next"></div> -->
+
     <div class="swiper-pagination"></div>
   </div>
 </section>
 
-<section class="events">
+<section class="events" id="events">
   <div class="section-head">
     <h2>Ближайшие события</h2>
-    <a href="#">Все события →</a>
+    <a href="events.html">Все события →</a>
   </div>
 
   <div class="events-calendar">
-    <button class="day active">
-      <span>25</span>
-      <small>май</small>
-    </button>
+    <button class="day active" data-day="2026-05-24">
+  <span>12</span>
+  <small>Июль</small>
+</button>
 
-    <button class="day">
-      <span>26</span>
-      <small>май</small>
-    </button>
+<button class="day" data-day="2026-05-31">
+  <span>19</span>
+  <small>Июль</small>
+</button>
 
-    <button class="day">
-      <span>28</span>
-      <small>май</small>
-    </button>
+<button class="day" data-day="2026-06-07">
+  <span>26</span>
+  <small>Июль</small>
+</button>
 
-    <button class="day">
-      <span>30</span>
-      <small>май</small>
-    </button>
+<button class="day" data-day="2026-06-14">
+  <span>2</span>
+  <small>Август</small>
+</button>
   </div>
 
-  <div class="events-list">
-    <div class="event-item">
-      <div class="event-time">11:00</div>
-      <div>
-        <h3>Воскресное богослужение</h3>
-        <p>Главный зал</p>
-      </div>
-    </div>
-
-    <div class="event-item">
-      <div class="event-time">18:00</div>
-      <div>
-        <h3>Молодёжная встреча</h3>
-        <p>Молитвенный зал</p>
-      </div>
-    </div>
-  </div>
+  <div class="events-list" id="eventsList"></div>
 </section>
 
 <section class="videos">
   <div class="section-head">
     <h2>Последние видео</h2>
-    <a href="#">Все видео →</a>
+    <a target="_blank" href="https://www.youtube.com/@Marina-Korotenko-w1s">Все видео →</a>
   </div>
 
   <div class="videos-list">
@@ -146,7 +155,7 @@
     </div>
   </div>
 
-  <a class="all-videos-btn" href="#">Смотреть все видео</a>
+  <a target="_blank" class="all-videos-btn" href="https://www.youtube.com/@Marina-Korotenko-w1s">Смотреть все видео</a>
 </section>
 
 <section class="contacts" id="contacts">
@@ -191,6 +200,7 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  
   <script src="js/script.js"></script>
 </body>
 </html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Контакты | Philadelphia</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/contacts.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <img src="images/logo.png" alt="Philadelphia">
+  </div>
+
+  <button class="burger" id="burgerBtn">☰</button>
+
+  <nav class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Главная</a>
+    <a href="about.html">О нас</a>
+    <a href="services.html">Служения</a>
+    <a href="events.html">События</a>
+    <a href="contacts.html">Контакты</a>
+  </nav>
+</header>
+
+<main class="contacts-page">
+
+  <section class="contacts-hero">
+    <p class="about-label">Контакты</p>
+    <h1>Мы будем рады видеть тебя</h1>
+    <p>
+      Приходи на служение, напиши нам или построй маршрут до церкви.
+    </p>
+  </section>
+
+  <section class="contacts-full">
+
+    <div class="contact-card">
+      <h3>Philadelphia Christengemeinde Bremen</h3>
+
+      <p>
+        <strong>Адрес</strong><br>
+        Horner Heerstraße 28<br>
+        28359 Bremen
+      </p>
+
+      <p>
+        <strong>Время служения</strong><br>
+        Каждое воскресенье в 15:00
+      </p>
+
+      <p>
+        <strong>Email</strong><br>
+        info@example.de
+      </p>
+    </div>
+
+    <div class="map-box">
+      <iframe
+        src="https://www.openstreetmap.org/export/embed.html?bbox=8.8675%2C53.0956%2C8.8717%2C53.0979&layer=mapnik&marker=53.0967454%2C8.8695744"
+        loading="lazy">
+      </iframe>
+    </div>
+
+    <a
+      class="route-btn"
+      href="https://www.google.com/maps/dir/?api=1&destination=Horner+Heerstraße+28,+28359+Bremen"
+      target="_blank"
+      rel="noopener">
+      📍 Построить маршрут
+    </a>
+
+  </section>
+
+</main>
+
+<script src="js/script.js"></script>
+</body>
+</html>
