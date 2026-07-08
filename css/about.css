@@ -1,0 +1,97 @@
+/* ABOUT PAGE */
+
+.about-page {
+  padding-top: 80px;
+  background: var(--white);
+}
+
+.about-intro {
+  padding: 50px 20px;
+  background: linear-gradient(135deg, var(--section), var(--white));
+}
+
+.about-label {
+  color: var(--primary);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 16px;
+}
+
+.about-intro h1 {
+  font-size: 40px;
+  line-height: 1.05;
+  margin-bottom: 22px;
+  color: var(--text);
+}
+
+.about-intro p {
+  font-size: 17px;
+  line-height: 1.7;
+  color: #667085;
+  margin-bottom: 16px;
+}
+
+.about-btn {
+  margin-top: 16px;
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+  padding: 16px 24px;
+  border-radius: 18px;
+  font-weight: 800;
+}
+
+.about-section {
+  padding: 46px 20px;
+  background: var(--background);
+}
+
+.blue-section {
+  background: var(--section);
+}
+
+.about-section h2 {
+  font-size: 32px;
+  line-height: 1.1;
+  margin-bottom: 22px;
+  color: var(--text);
+}
+
+.text-card {
+  background: white;
+  border-radius: 24px;
+  padding: 26px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.06);
+}
+
+.text-card h3 {
+  font-size: 24px;
+  line-height: 1.2;
+  margin-bottom: 18px;
+  color: var(--primary);
+}
+
+.text-card p {
+  font-size: 16px;
+  line-height: 1.75;
+  color: #667085;
+  margin-bottom: 16px;
+}
+
+.text-card p:last-child {
+  margin-bottom: 0;
+}
+
+.pastors-section {
+  background: var(--white);
+}
+
+.pastors-photo {
+  width: 100%;
+  border-radius: 24px;
+  margin-bottom: 22px;
+  display: block;
+  box-shadow: 0 12px 30px rgba(0,0,0,.08);
+}
