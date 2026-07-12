@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Молитвенный запрос | Philadelphia</title>
+
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/prayer-request.css">
+</head>
+
+<body>
+
+<header class="header">
+  <a class="logo" href="index.html">
+    <img
+      src="images/logo.png"
+      alt="Philadelphia Christengemeinde Bremen"
+    >
+  </a>
+
+  <a href="donate.html" class="header-donate-btn">
+    ♥ Пожертвовать
+  </a>
+
+  <button
+    class="burger"
+    id="burgerBtn"
+    type="button"
+    aria-label="Открыть меню"
+    aria-expanded="false"
+  >
+    ☰
+  </button>
+
+  <nav class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Главная</a>
+    <a href="about.html">О нас</a>
+    <a href="services.html">Служения</a>
+    <a href="events.html">События</a>
+    <a href="news.html">Новости</a>
+    <a href="gallery.html">Галерея</a>
+    <a href="prayer-request.html" class="active-link">
+      Молитвенный запрос
+    </a>
+    <a href="contacts.html">Контакты</a>
+  </nav>
+</header>
+
+<main class="prayer-page">
+
+  <section class="prayer-hero">
+    <div class="prayer-hero-icon">🙏</div>
+
+    <p class="about-label">Мы рядом</p>
+
+    <h1>Молитвенный запрос</h1>
+
+    <p>
+      Расскажи, о чём мы можем молиться вместе с тобой.
+      Твой запрос будет принят с уважением, вниманием и заботой.
+    </p>
+  </section>
+
+  <section class="prayer-content">
+
+    <article class="prayer-intro-card">
+      <h2>Мы хотим поддержать тебя</h2>
+
+      <p>
+        В жизни бывают моменты, когда особенно нужна молитва,
+        поддержка и человек, который готов быть рядом.
+      </p>
+
+      <p>
+        Ты можешь написать своё имя или отправить запрос анонимно.
+        Указывать телефон и email необязательно.
+      </p>
+    </article>
+
+    <form class="prayer-form" id="prayerForm" novalidate>
+
+      <div class="form-heading">
+        <span>Молитвенная просьба</span>
+        <h2>Напиши свой запрос</h2>
+      </div>
+
+      <div class="form-group">
+        <label for="prayerName">Имя</label>
+
+        <input
+          type="text"
+          id="prayerName"
+          name="name"
+          placeholder="Как к вам обращаться?"
+          maxlength="80"
+        >
+
+        <small>Можно оставить поле пустым</small>
+      </div>
+
+      <div class="form-group">
+        <label for="prayerContact">
+          Телефон или email
+        </label>
+
+        <input
+          type="text"
+          id="prayerContact"
+          name="contact"
+          placeholder="Для обратной связи"
+          maxlength="120"
+        >
+
+        <small>Указывать необязательно</small>
+      </div>
+
+      <div class="form-group">
+        <label for="prayerText">
+          О чём мы можем молиться? *
+        </label>
+
+        <textarea
+          id="prayerText"
+          name="request"
+          rows="7"
+          placeholder="Напишите свою молитвенную просьбу..."
+          minlength="10"
+          maxlength="2000"
+          required
+        ></textarea>
+
+        <div class="textarea-info">
+          <small id="prayerError" class="form-error"></small>
+          <small id="characterCounter">0 / 2000</small>
+        </div>
+      </div>
+
+      <label class="anonymous-option">
+        <input
+          type="checkbox"
+          id="anonymousRequest"
+          name="anonymous"
+        >
+
+        <span class="custom-checkbox"></span>
+
+        <span>
+          Отправить запрос анонимно
+        </span>
+      </label>
+
+      <label class="privacy-option">
+        <input
+          type="checkbox"
+          id="privacyConsent"
+          name="privacy"
+          required
+        >
+
+        <span class="custom-checkbox"></span>
+
+        <span>
+          Я согласен(-на) на обработку данных для рассмотрения
+          молитвенного запроса.
+        </span>
+      </label>
+
+      <p class="form-error privacy-error" id="privacyError"></p>
+
+      <button type="submit" class="prayer-submit-btn">
+        <span>🙏</span>
+        Отправить молитвенный запрос
+      </button>
+
+      <p class="prayer-form-note">
+        Запрос не будет опубликован на сайте.
+      </p>
+
+    </form>
+
+    <div
+      class="prayer-success"
+      id="prayerSuccess"
+      aria-live="polite"
+    >
+      <div class="prayer-success-icon">✓</div>
+
+      <h2>Спасибо за доверие</h2>
+
+      <p>
+        Ваш молитвенный запрос подготовлен к отправке.
+        Мы будем молиться вместе с вами.
+      </p>
+
+      <button
+        type="button"
+        id="sendAnotherRequest"
+        class="send-another-btn"
+      >
+        Отправить ещё один запрос
+      </button>
+    </div>
+
+    <article class="prayer-contact-card">
+      <span>Нужна личная беседа?</span>
+
+      <h2>Ты можешь связаться с нами</h2>
+
+      <p>
+        Напиши или приходи на служение каждое воскресенье в 15:00.
+      </p>
+
+      <a href="contacts.html">
+        Открыть контакты →
+      </a>
+    </article>
+
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-container">
+
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo-link">
+        <img
+          src="images/logo.png"
+          class="footer-logo"
+          alt="Philadelphia Christengemeinde Bremen"
+        >
+      </a>
+
+      <p class="footer-title">
+        Philadelphia Christengemeinde Bremen
+      </p>
+
+      <p class="footer-description">
+        Церковь, где тебя видят, слышат и принимают.
+      </p>
+    </div>
+
+    <div class="footer-nav">
+      <h3>Навигация</h3>
+
+      <div class="footer-nav-grid">
+        <a href="index.html">Главная</a>
+        <a href="about.html">О нас</a>
+        <a href="services.html">Служения</a>
+        <a href="events.html">События</a>
+        <a href="news.html">Новости</a>
+        <a href="gallery.html">Галерея</a>
+        <a href="donate.html">Пожертвование</a>
+        <a href="contacts.html">Контакты</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2026 Philadelphia Christengemeinde Bremen</p>
+  </div>
+</footer>
+
+<script src="js/prayer-request.js"></script>
+
+</body>
+</html>

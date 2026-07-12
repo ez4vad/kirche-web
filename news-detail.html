@@ -3,23 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Молодёжное служение | Philadelphia</title>
+
+  <title>Новость | Philadelphia</title>
+
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/services-container.css">
+  <link rel="stylesheet" href="css/news-detail.css">
 </head>
 <body>
 
 <header class="header">
-  <div class="logo">
-    <a href="index.html">
-        <img src="images/logo.png" alt="Philadelphia Christengemeinde Bremen">
-      </a>
-  </div>
+  <a class="logo" href="index.html">
+    <img
+      src="images/logo.png"
+      alt="Philadelphia Christengemeinde Bremen"
+    >
+  </a>
 
   <a href="donate.html" class="header-donate-btn">
     ♥ Пожертвовать
     </a>
-  <button class="burger" id="burgerBtn">☰</button>
+  <button
+    class="burger"
+    id="burgerBtn"
+    type="button"
+    aria-label="Открыть меню"
+  >
+    ☰
+  </button>
 
   <nav class="mobile-menu" id="mobileMenu">
    <a href="index.html">Главная</a>
@@ -33,39 +43,14 @@
   </nav>
 </header>
 
-<main class="service-detail">
-
-  <section class="service-detail-hero">
-    <img src="images/service-youth.jpg" alt="Молодёжное служение">
-
-    <div class="service-detail-text">
-      <span>Молодёжь</span>
-      <h1>Молодёжное служение</h1>
-      <p>Пространство для дружбы, честных вопросов, веры и роста.</p>
+<main class="news-detail-page">
+  <article class="news-detail" id="newsDetail">
+    <div class="news-detail-loading">
+      Загрузка новости...
     </div>
-  </section>
+  </article>
+</main>
 
-  <section class="service-detail-content">
-    <h2>О служении</h2>
-
-    <p>
-      Молодёжь Филадельфии — это пространство для честных вопросов,
-      настоящей дружбы, веры и духовного роста.
-    </p>
-
-    <p>
-      Здесь можно говорить о том, что действительно волнует: о вере,
-      отношениях, выборе, будущем, характере, свободе и ответственности.
-    </p>
-
-    <p>
-      Мы хотим, чтобы молодые люди не просто посещали церковь,
-      а находили живые отношения с Богом, хорошее окружение
-      и своё место в служении.
-    </p>
-
-    <a href="contacts.html" class="service-detail-btn">Присоединиться</a>
-  </section>
 <footer class="footer">
   <div class="footer-container">
 
@@ -192,8 +177,7 @@
     <p>Сделано с <span>♥</span></p>
   </div>
 </footer>
-</main>
 
-<script src="js/script.js"></script>
+<script src="js/news-detail.js"></script>
 </body>
 </html>

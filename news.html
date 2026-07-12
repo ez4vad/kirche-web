@@ -3,26 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Молодёжное служение | Philadelphia</title>
+
+  <title>Новости | Philadelphia</title>
+
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/services-container.css">
+  <link rel="stylesheet" href="css/news.css">
 </head>
+
 <body>
 
 <header class="header">
-  <div class="logo">
-    <a href="index.html">
-        <img src="images/logo.png" alt="Philadelphia Christengemeinde Bremen">
-      </a>
-  </div>
+  <a class="logo" href="index.html">
+    <img
+      src="images/logo.png"
+      alt="Philadelphia Christengemeinde Bremen"
+    >
+  </a>
 
   <a href="donate.html" class="header-donate-btn">
     ♥ Пожертвовать
     </a>
-  <button class="burger" id="burgerBtn">☰</button>
+  <button
+    class="burger"
+    id="burgerBtn"
+    type="button"
+    aria-label="Открыть меню"
+    aria-expanded="false"
+  >
+    ☰
+  </button>
 
   <nav class="mobile-menu" id="mobileMenu">
-   <a href="index.html">Главная</a>
+    <a href="index.html">Главная</a>
     <a href="about.html">О нас</a>
     <a href="services.html">Служения</a>
     <a href="events.html">События</a>
@@ -33,39 +45,119 @@
   </nav>
 </header>
 
-<main class="service-detail">
+<main class="news-page">
 
-  <section class="service-detail-hero">
-    <img src="images/service-youth.jpg" alt="Молодёжное служение">
+  <section class="news-hero">
+    <p class="about-label">Жизнь церкви</p>
 
-    <div class="service-detail-text">
-      <span>Молодёжь</span>
-      <h1>Молодёжное служение</h1>
-      <p>Пространство для дружбы, честных вопросов, веры и роста.</p>
+    <h1>Новости</h1>
+
+    <p>
+      Здесь мы делимся важными событиями, встречами и новостями
+      церкви «Филадельфия».
+    </p>
+  </section>
+
+  <section class="news-section">
+
+    <div class="news-list">
+
+      <article class="news-card">
+        <a href="news-detail.html?id=1" class="news-image-link">
+          <img
+            src="images/news-1.jpg"
+            alt="Воскресное служение в церкви"
+          >
+
+          <span class="news-category">Богослужение</span>
+        </a>
+
+        <div class="news-content">
+          <time datetime="2026-07-12">12 июля 2026</time>
+
+          <h2>
+            <a href="news-detail.html?id=1">
+              Воскресное служение в церкви «Филадельфия»
+            </a>
+          </h2>
+
+          <p>
+            Приглашаем провести воскресный день вместе в молитве,
+            прославлении и общении.
+          </p>
+
+          <a href="news-detail.html?id=1" class="news-read-more">
+            Читать подробнее →
+          </a>
+        </div>
+      </article>
+
+      <article class="news-card">
+        <a href="news-detail.html?id=2" class="news-image-link">
+          <img
+            src="images/news-2.jpg"
+            alt="Молодёжная встреча"
+          >
+
+          <span class="news-category">Молодёжь</span>
+        </a>
+
+        <div class="news-content">
+          <time datetime="2026-07-05">5 июля 2026</time>
+
+          <h2>
+            <a href="news-youth.html">
+              Молодёжная встреча: вера, дружба и честные вопросы
+            </a>
+          </h2>
+
+          <p>
+            Вечер для молодых людей, где можно общаться, задавать вопросы
+            и вместе узнавать Бога.
+          </p>
+
+          <a href="news-detail.html?id=2" class="news-read-more">
+            Читать подробнее →
+          </a>
+        </div>
+      </article>
+
+      <article class="news-card">
+        <a href="news-detail.html?id=3" class="news-image-link">
+          <img
+            src="images/news-3.jpg"
+            alt="Общение после служения"
+          >
+
+          <span class="news-category">Община</span>
+        </a>
+
+        <div class="news-content">
+          <time datetime="2026-06-28">28 июня 2026</time>
+
+          <h2>
+            <a href="news-community.html">
+              Время общения и тёплый обед после служения
+            </a>
+          </h2>
+
+          <p>
+            После богослужения мы остаёмся вместе, знакомимся,
+            поддерживаем друг друга и разделяем трапезу.
+          </p>
+
+          <a href="news-detail.html?id=3" class="news-read-more">
+            Читать подробнее →
+          </a>
+        </div>
+      </article>
+
     </div>
+
   </section>
 
-  <section class="service-detail-content">
-    <h2>О служении</h2>
+</main>
 
-    <p>
-      Молодёжь Филадельфии — это пространство для честных вопросов,
-      настоящей дружбы, веры и духовного роста.
-    </p>
-
-    <p>
-      Здесь можно говорить о том, что действительно волнует: о вере,
-      отношениях, выборе, будущем, характере, свободе и ответственности.
-    </p>
-
-    <p>
-      Мы хотим, чтобы молодые люди не просто посещали церковь,
-      а находили живые отношения с Богом, хорошее окружение
-      и своё место в служении.
-    </p>
-
-    <a href="contacts.html" class="service-detail-btn">Присоединиться</a>
-  </section>
 <footer class="footer">
   <div class="footer-container">
 
@@ -192,8 +284,8 @@
     <p>Сделано с <span>♥</span></p>
   </div>
 </footer>
-</main>
 
 <script src="js/script.js"></script>
+
 </body>
 </html>
