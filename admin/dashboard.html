@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Панель администратора | Philadelphia</title>
+
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body class="admin-dashboard-page">
+
+  <div class="admin-layout">
+
+    <aside class="admin-sidebar" id="adminSidebar">
+
+      <div class="admin-sidebar-top">
+
+        <a href="../index.html" class="admin-sidebar-logo">
+          <img
+            src="../images/logo.png"
+            alt="Philadelphia"
+          >
+        </a>
+
+        <button
+          class="admin-sidebar-close"
+          id="adminSidebarClose"
+          type="button"
+          aria-label="Закрыть меню"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <nav class="admin-navigation">
+
+        <a href="dashboard.html" class="admin-nav-link active">
+          <span>⌂</span>
+          Главная
+        </a>
+
+        <a href="events.html" class="admin-nav-link">
+          <span>◫</span>
+          События
+        </a>
+
+        <a href="news.html" class="admin-nav-link">
+          <span>▤</span>
+          Новости
+        </a>
+
+        <a href="gallery.html" class="admin-nav-link">
+          <span>▦</span>
+          Галерея
+        </a>
+
+        <a href="prayer.html" class="admin-nav-link">
+          <span>♡</span>
+          Молитвенные запросы
+        </a>
+
+        <a href="settings.html" class="admin-nav-link">
+          <span>⚙</span>
+          Настройки
+        </a>
+
+      </nav>
+
+      <div class="admin-sidebar-bottom">
+
+        <a href="../index.html" class="admin-site-link">
+          Открыть сайт
+        </a>
+
+        <button
+          class="admin-logout-button"
+          id="adminLogoutButton"
+          type="button"
+        >
+          Выйти
+        </button>
+
+      </div>
+
+    </aside>
+
+    <div class="admin-sidebar-overlay" id="adminSidebarOverlay"></div>
+
+    <main class="admin-main">
+
+      <header class="admin-topbar">
+
+        <button
+          class="admin-menu-button"
+          id="adminMenuButton"
+          type="button"
+          aria-label="Открыть меню"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="admin-topbar-title">
+          <span>Панель управления</span>
+          <strong>Philadelphia</strong>
+        </div>
+
+        <div class="admin-profile">
+          <div class="admin-avatar">A</div>
+
+          <div class="admin-profile-text">
+            <strong>Администратор</strong>
+            <span>Онлайн</span>
+          </div>
+        </div>
+
+      </header>
+
+      <section class="admin-dashboard-content">
+
+        <div class="admin-welcome-block">
+          <div>
+            <span class="admin-section-label">
+              Добро пожаловать
+            </span>
+
+            <h1>Здравствуйте, Администратор</h1>
+
+            <p>
+              Здесь можно управлять новостями, событиями,
+              фотографиями и молитвенными запросами.
+            </p>
+          </div>
+
+          <a href="../index.html" class="admin-view-site-btn">
+            Посмотреть сайт
+          </a>
+        </div>
+
+        <section class="admin-stats-grid">
+
+          <article class="admin-stat-card">
+            <div class="admin-stat-icon">▤</div>
+
+            <div>
+              <span>Новости</span>
+              <strong>3</strong>
+              <small>Опубликовано</small>
+            </div>
+          </article>
+
+          <article class="admin-stat-card">
+            <div class="admin-stat-icon">◫</div>
+
+            <div>
+              <span>События</span>
+              <strong>4</strong>
+              <small>Ближайшие</small>
+            </div>
+          </article>
+
+          <article class="admin-stat-card">
+            <div class="admin-stat-icon">▦</div>
+
+            <div>
+              <span>Фотографии</span>
+              <strong>6</strong>
+              <small>В галерее</small>
+            </div>
+          </article>
+
+          <article class="admin-stat-card admin-stat-alert">
+            <div class="admin-stat-icon">♡</div>
+
+            <div>
+              <span>Запросы</span>
+              <strong>2</strong>
+              <small>Новые</small>
+            </div>
+          </article>
+
+        </section>
+
+        <section class="admin-quick-actions">
+
+          <div class="admin-section-heading">
+            <div>
+              <span>Быстрый доступ</span>
+              <h2>Что хотите сделать?</h2>
+            </div>
+          </div>
+
+          <div class="admin-actions-grid">
+
+            <a href="news.html" class="admin-action-card">
+              <div class="admin-action-icon">＋</div>
+
+              <div>
+                <h3>Добавить новость</h3>
+                <p>Создать новую публикацию</p>
+              </div>
+
+              <span class="admin-action-arrow">→</span>
+            </a>
+
+            <a href="events.html" class="admin-action-card">
+              <div class="admin-action-icon">＋</div>
+
+              <div>
+                <h3>Добавить событие</h3>
+                <p>Указать дату и время</p>
+              </div>
+
+              <span class="admin-action-arrow">→</span>
+            </a>
+
+            <a href="gallery.html" class="admin-action-card">
+              <div class="admin-action-icon">＋</div>
+
+              <div>
+                <h3>Добавить фото</h3>
+                <p>Загрузить в галерею</p>
+              </div>
+
+              <span class="admin-action-arrow">→</span>
+            </a>
+
+            <a href="prayer.html" class="admin-action-card">
+              <div class="admin-action-icon">♡</div>
+
+              <div>
+                <h3>Открыть запросы</h3>
+                <p>Просмотреть новые обращения</p>
+              </div>
+
+              <span class="admin-action-arrow">→</span>
+            </a>
+
+          </div>
+
+        </section>
+
+        <section class="admin-recent-section">
+
+          <div class="admin-section-heading">
+            <div>
+              <span>Последние изменения</span>
+              <h2>Недавняя активность</h2>
+            </div>
+          </div>
+
+          <div class="admin-activity-list">
+
+            <article class="admin-activity-item">
+              <div class="admin-activity-dot"></div>
+
+              <div>
+                <h3>Добавлена новая фотография</h3>
+                <p>Категория: Молодёжь</p>
+              </div>
+
+              <time>Сегодня</time>
+            </article>
+
+            <article class="admin-activity-item">
+              <div class="admin-activity-dot"></div>
+
+              <div>
+                <h3>Обновлено воскресное событие</h3>
+                <p>Время служения: 15:00</p>
+              </div>
+
+              <time>Вчера</time>
+            </article>
+
+            <article class="admin-activity-item">
+              <div class="admin-activity-dot"></div>
+
+              <div>
+                <h3>Опубликована новость</h3>
+                <p>Воскресное служение</p>
+              </div>
+
+              <time>2 дня назад</time>
+            </article>
+
+          </div>
+
+        </section>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <script src="js/dashboard.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Вход в админ-панель | Philadelphia</title>
+
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body class="admin-login-page">
+
+  <main class="admin-login-wrapper">
+
+    <section class="admin-login-card">
+
+      <a href="../index.html" class="admin-login-logo">
+        <img
+          src="../images/logo.png"
+          alt="Philadelphia Christengemeinde Bremen"
+        >
+      </a>
+
+      <div class="admin-login-heading">
+        <span>Панель управления</span>
+
+        <h1>Вход администратора</h1>
+
+        <p>
+          Введите логин и пароль, чтобы управлять содержимым сайта.
+        </p>
+      </div>
+
+      <form
+        class="admin-login-form"
+        id="adminLoginForm"
+        novalidate
+      >
+
+        <div class="admin-form-group">
+          <label for="adminLogin">
+            Логин
+          </label>
+
+          <input
+            type="text"
+            id="adminLogin"
+            name="login"
+            placeholder="Введите логин"
+            autocomplete="username"
+            required
+          >
+        </div>
+
+        <div class="admin-form-group">
+          <label for="adminPassword">
+            Пароль
+          </label>
+
+          <div class="admin-password-field">
+            <input
+              type="password"
+              id="adminPassword"
+              name="password"
+              placeholder="Введите пароль"
+              autocomplete="current-password"
+              required
+            >
+
+            <button
+              class="admin-password-toggle"
+              id="passwordToggle"
+              type="button"
+              aria-label="Показать пароль"
+            >
+              👁
+            </button>
+          </div>
+        </div>
+
+        <p
+          class="admin-login-error"
+          id="adminLoginError"
+          aria-live="polite"
+        ></p>
+
+        <button
+          type="submit"
+          class="admin-login-button"
+        >
+          Войти
+        </button>
+
+      </form>
+
+      <a href="../index.html" class="admin-back-link">
+        ← Вернуться на сайт
+      </a>
+
+    </section>
+
+  </main>
+
+  <script src="js/login.js"></script>
+
+</body>
+</html>

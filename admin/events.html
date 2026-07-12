@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Управление событиями | Philadelphia</title>
+
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body class="admin-dashboard-page">
+
+  <div class="admin-layout">
+
+    <aside class="admin-sidebar" id="adminSidebar">
+
+      <div class="admin-sidebar-top">
+        <a href="../index.html" class="admin-sidebar-logo">
+          <img
+            src="../images/logo.png"
+            alt="Philadelphia"
+          >
+        </a>
+
+        <button
+          class="admin-sidebar-close"
+          id="adminSidebarClose"
+          type="button"
+          aria-label="Закрыть меню"
+        >
+          ×
+        </button>
+      </div>
+
+      <nav class="admin-navigation">
+        <a href="dashboard.html" class="admin-nav-link">
+          <span>⌂</span>
+          Главная
+        </a>
+
+        <a href="events.html" class="admin-nav-link active">
+          <span>◫</span>
+          События
+        </a>
+
+        <a href="news.html" class="admin-nav-link">
+          <span>▤</span>
+          Новости
+        </a>
+
+        <a href="gallery.html" class="admin-nav-link">
+          <span>▦</span>
+          Галерея
+        </a>
+
+        <a href="prayer.html" class="admin-nav-link">
+          <span>♡</span>
+          Молитвенные запросы
+        </a>
+
+        <a href="settings.html" class="admin-nav-link">
+          <span>⚙</span>
+          Настройки
+        </a>
+      </nav>
+
+      <div class="admin-sidebar-bottom">
+        <a href="../index.html" class="admin-site-link">
+          Открыть сайт
+        </a>
+
+        <button
+          class="admin-logout-button"
+          id="adminLogoutButton"
+          type="button"
+        >
+          Выйти
+        </button>
+      </div>
+
+    </aside>
+
+    <div
+      class="admin-sidebar-overlay"
+      id="adminSidebarOverlay"
+    ></div>
+
+    <main class="admin-main">
+
+      <header class="admin-topbar">
+        <button
+          class="admin-menu-button"
+          id="adminMenuButton"
+          type="button"
+          aria-label="Открыть меню"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="admin-topbar-title">
+          <span>Панель управления</span>
+          <strong>События</strong>
+        </div>
+
+        <div class="admin-profile">
+          <div class="admin-avatar">A</div>
+        </div>
+      </header>
+
+      <section class="admin-dashboard-content">
+
+        <div class="admin-page-heading">
+          <div>
+            <span class="admin-section-label">
+              Календарь церкви
+            </span>
+
+            <h1>Управление событиями</h1>
+
+            <p>
+              Добавляйте, редактируйте и удаляйте мероприятия.
+            </p>
+          </div>
+
+          <button
+            class="admin-primary-button"
+            id="openEventFormButton"
+            type="button"
+          >
+            + Добавить событие
+          </button>
+        </div>
+
+        <section
+          class="admin-event-form-section"
+          id="eventFormSection"
+          hidden
+        >
+          <div class="admin-form-card">
+
+            <div class="admin-form-card-heading">
+              <div>
+                <span id="eventFormLabel">
+                  Новое событие
+                </span>
+
+                <h2 id="eventFormTitle">
+                  Добавить событие
+                </h2>
+              </div>
+
+              <button
+                class="admin-form-close"
+                id="closeEventFormButton"
+                type="button"
+                aria-label="Закрыть форму"
+              >
+                ×
+              </button>
+            </div>
+
+            <form id="eventForm" novalidate>
+
+              <input
+                type="hidden"
+                id="eventId"
+              >
+
+              <div class="admin-form-group">
+                <label for="eventTitle">
+                  Название *
+                </label>
+
+                <input
+                  type="text"
+                  id="eventTitle"
+                  placeholder="Например: Воскресное служение"
+                  maxlength="120"
+                  required
+                >
+              </div>
+
+              <div class="admin-form-row">
+                <div class="admin-form-group">
+                  <label for="eventDate">
+                    Дата *
+                  </label>
+
+                  <input
+                    type="date"
+                    id="eventDate"
+                    required
+                  >
+                </div>
+
+                <div class="admin-form-group">
+                  <label for="eventTime">
+                    Время *
+                  </label>
+
+                  <input
+                    type="time"
+                    id="eventTime"
+                    required
+                  >
+                </div>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="eventPlace">
+                  Адрес *
+                </label>
+
+                <input
+                  type="text"
+                  id="eventPlace"
+                  value="Horner Heerstraße 28, 28359 Bremen"
+                  maxlength="180"
+                  required
+                >
+              </div>
+
+              <div class="admin-form-group">
+                <label for="eventDescription">
+                  Описание
+                </label>
+
+                <textarea
+                  id="eventDescription"
+                  rows="5"
+                  placeholder="Краткое описание события"
+                  maxlength="1000"
+                ></textarea>
+              </div>
+
+              <label class="admin-checkbox-row">
+                <input
+                  type="checkbox"
+                  id="eventPublished"
+                  checked
+                >
+
+                <span></span>
+
+                <strong>
+                  Показывать событие на сайте
+                </strong>
+              </label>
+
+              <p
+                class="admin-form-error"
+                id="eventFormError"
+              ></p>
+
+              <div class="admin-form-actions">
+                <button
+                  class="admin-secondary-button"
+                  id="cancelEventButton"
+                  type="button"
+                >
+                  Отмена
+                </button>
+
+                <button
+                  class="admin-primary-button"
+                  type="submit"
+                >
+                  Сохранить событие
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </section>
+
+        <section class="admin-events-section">
+
+          <div class="admin-section-heading">
+            <div>
+              <span>Все мероприятия</span>
+              <h2>Список событий</h2>
+            </div>
+
+            <strong
+              class="admin-items-count"
+              id="eventsCount"
+            >
+              0
+            </strong>
+          </div>
+
+          <div
+            class="admin-events-list"
+            id="adminEventsList"
+          ></div>
+
+          <div
+            class="admin-empty-state"
+            id="eventsEmptyState"
+            hidden
+          >
+            <div>◫</div>
+
+            <h3>Событий пока нет</h3>
+
+            <p>
+              Нажмите «Добавить событие», чтобы создать первое мероприятие.
+            </p>
+          </div>
+
+        </section>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <div
+    class="admin-confirm-modal"
+    id="deleteEventModal"
+    aria-hidden="true"
+  >
+    <div class="admin-confirm-card">
+      <div class="admin-confirm-icon">!</div>
+
+      <h2>Удалить событие?</h2>
+
+      <p>
+        Это действие нельзя будет отменить.
+      </p>
+
+      <div class="admin-confirm-actions">
+        <button
+          class="admin-secondary-button"
+          id="cancelDeleteEventButton"
+          type="button"
+        >
+          Отмена
+        </button>
+
+        <button
+          class="admin-danger-button"
+          id="confirmDeleteEventButton"
+          type="button"
+        >
+          Удалить
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/events-admin.js"></script>
+
+</body>
+</html>
