@@ -55,7 +55,7 @@ privacyConsent.addEventListener("change", () => {
   }
 });
 
-prayerForm.addEventListener("submit", (event) => {
+prayerForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const requestText = prayerText.value.trim();
@@ -93,19 +93,74 @@ prayerForm.addEventListener("submit", (event) => {
     contact: prayerContact.value.trim(),
     request: requestText,
     anonymous: anonymousRequest.checked,
-    createdAt: new Date().toISOString()
+   
   };
 
-  console.log("Молитвенный запрос:", prayerRequest);
+ const submitButton =
+  prayerForm.querySelector(
+    'button[type="submit"]'
+  );
+
+submitButton.disabled = true;
+submitButton.innerHTML =
+  "<span>⏳</span> Отправка...";
+
+try {
+
+  const response = await fetch(
+    "/api/prayer-requests",
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+
+      body: JSON.stringify(
+        prayerRequest
+      )
+    }
+  );
+
+  if (!response.ok) {
+
+    const data =
+      await response.json();
+
+    throw new Error(
+      data.error ||
+      "Не удалось отправить запрос."
+    );
+
+  }
 
   prayerForm.hidden = true;
-  prayerSuccess.classList.add("active");
+
+  prayerSuccess.classList.add(
+    "active"
+  );
 
   prayerSuccess.scrollIntoView({
     behavior: "smooth",
     block: "center"
   });
-});
+
+} catch (error) {
+
+  console.error(error);
+
+  prayerError.textContent =
+    error.message;
+
+} finally {
+
+  submitButton.disabled = false;
+
+  submitButton.innerHTML =
+    "<span>🙏</span> Отправить молитвенный запрос";
+
+}});
 
 sendAnotherRequest.addEventListener("click", () => {
   prayerForm.reset();

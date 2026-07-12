@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Молитвенные запросы | Philadelphia</title>
+
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body class="admin-dashboard-page">
+
+  <div class="admin-layout">
+
+    <aside class="admin-sidebar" id="adminSidebar">
+
+      <div class="admin-sidebar-top">
+        <a href="../index.html" class="admin-sidebar-logo">
+          <img
+            src="../images/logo.png"
+            alt="Philadelphia"
+          >
+        </a>
+
+        <button
+          class="admin-sidebar-close"
+          id="adminSidebarClose"
+          type="button"
+          aria-label="Закрыть меню"
+        >
+          ×
+        </button>
+      </div>
+
+      <nav class="admin-navigation">
+
+        <a href="dashboard.html" class="admin-nav-link">
+          <span>⌂</span>
+          Главная
+        </a>
+
+        <a href="events.html" class="admin-nav-link">
+          <span>◫</span>
+          События
+        </a>
+
+        <a href="news.html" class="admin-nav-link">
+          <span>▤</span>
+          Новости
+        </a>
+
+        <a href="gallery.html" class="admin-nav-link">
+          <span>▦</span>
+          Галерея
+        </a>
+
+        <a href="prayer.html" class="admin-nav-link active">
+          <span>♡</span>
+          Молитвенные запросы
+        </a>
+
+        <a href="settings.html" class="admin-nav-link">
+          <span>⚙</span>
+          Настройки
+        </a>
+
+      </nav>
+
+      <div class="admin-sidebar-bottom">
+
+        <a href="../prayer-request.html" class="admin-site-link">
+          Открыть форму запроса
+        </a>
+
+        <button
+          class="admin-logout-button"
+          id="adminLogoutButton"
+          type="button"
+        >
+          Выйти
+        </button>
+
+      </div>
+
+    </aside>
+
+    <div
+      class="admin-sidebar-overlay"
+      id="adminSidebarOverlay"
+    ></div>
+
+    <main class="admin-main">
+
+      <header class="admin-topbar">
+
+        <button
+          class="admin-menu-button"
+          id="adminMenuButton"
+          type="button"
+          aria-label="Открыть меню"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="admin-topbar-title">
+          <span>Панель управления</span>
+          <strong>Молитвенные запросы</strong>
+        </div>
+
+        <div class="admin-profile">
+          <div class="admin-avatar">A</div>
+        </div>
+
+      </header>
+
+      <section class="admin-dashboard-content">
+
+        <div class="admin-page-heading">
+
+          <div>
+            <span class="admin-section-label">
+              Поддержка и молитва
+            </span>
+
+            <h1>Молитвенные запросы</h1>
+
+            <p>
+              Просматривайте новые обращения,
+              отмечайте их как прочитанные
+              и удаляйте при необходимости.
+            </p>
+          </div>
+
+        </div>
+
+        <section class="admin-prayer-controls">
+
+          <div class="admin-section-heading">
+
+            <div>
+              <span>Обращения</span>
+              <h2>Все запросы</h2>
+            </div>
+
+            <strong
+              class="admin-items-count"
+              id="prayerCount"
+            >
+              0
+            </strong>
+
+          </div>
+
+          <div class="admin-prayer-filters">
+
+            <button
+              type="button"
+              class="admin-prayer-filter active"
+              data-prayer-filter="all"
+            >
+              Все
+            </button>
+
+            <button
+              type="button"
+              class="admin-prayer-filter"
+              data-prayer-filter="new"
+            >
+              Новые
+            </button>
+
+            <button
+              type="button"
+              class="admin-prayer-filter"
+              data-prayer-filter="read"
+            >
+              Прочитанные
+            </button>
+
+          </div>
+
+        </section>
+
+        <section class="admin-prayer-section">
+
+          <div
+            class="admin-prayer-list"
+            id="adminPrayerList"
+          >
+            <div class="admin-empty-state">
+              <div>…</div>
+              <h3>Загрузка</h3>
+              <p>Получаем молитвенные запросы...</p>
+            </div>
+          </div>
+
+          <div
+            class="admin-empty-state"
+            id="prayerEmptyState"
+            hidden
+          >
+            <div>♡</div>
+
+            <h3>Запросов пока нет</h3>
+
+            <p>
+              Когда кто-то отправит молитвенную просьбу,
+              она появится здесь.
+            </p>
+          </div>
+
+        </section>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <div
+    class="admin-prayer-modal"
+    id="prayerModal"
+    aria-hidden="true"
+  >
+
+    <div class="admin-prayer-modal-card">
+
+      <div class="admin-form-card-heading">
+
+        <div>
+          <span id="prayerModalStatus">
+            Молитвенный запрос
+          </span>
+
+          <h2 id="prayerModalTitle">
+            Просмотр запроса
+          </h2>
+        </div>
+
+        <button
+          class="admin-form-close"
+          id="closePrayerModalButton"
+          type="button"
+          aria-label="Закрыть"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div class="admin-prayer-modal-meta">
+
+        <div>
+          <span>Имя</span>
+          <strong id="prayerModalName">—</strong>
+        </div>
+
+        <div>
+          <span>Контакт</span>
+          <strong id="prayerModalContact">—</strong>
+        </div>
+
+        <div>
+          <span>Дата</span>
+          <strong id="prayerModalDate">—</strong>
+        </div>
+
+      </div>
+
+      <div class="admin-prayer-text">
+        <p id="prayerModalText"></p>
+      </div>
+
+      <div class="admin-prayer-modal-actions">
+
+        <button
+          class="admin-secondary-button"
+          id="togglePrayerStatusButton"
+          type="button"
+        >
+          Отметить прочитанным
+        </button>
+
+        <button
+          class="admin-danger-button"
+          id="deletePrayerButton"
+          type="button"
+        >
+          Удалить
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div
+    class="admin-confirm-modal"
+    id="deletePrayerModal"
+    aria-hidden="true"
+  >
+
+    <div class="admin-confirm-card">
+
+      <div class="admin-confirm-icon">!</div>
+
+      <h2>Удалить запрос?</h2>
+
+      <p>
+        Это действие нельзя будет отменить.
+      </p>
+
+      <div class="admin-confirm-actions">
+
+        <button
+          class="admin-secondary-button"
+          id="cancelDeletePrayerButton"
+          type="button"
+        >
+          Отмена
+        </button>
+
+        <button
+          class="admin-danger-button"
+          id="confirmDeletePrayerButton"
+          type="button"
+        >
+          Удалить
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="js/prayer-admin.js"></script>
+
+</body>
+</html>

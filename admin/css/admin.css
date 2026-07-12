@@ -1558,3 +1558,757 @@ body {
     display:block;
 
 }
+
+/* ===================================
+   GALLERY ADMIN
+=================================== */
+
+.admin-gallery-upload-zone{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    gap:12px;
+
+    padding:40px;
+
+    border:2px dashed #d7dde8;
+    border-radius:20px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    background:#fafbfc;
+}
+
+.admin-gallery-upload-zone:hover{
+
+    border-color:#2ca7d8;
+
+    background:#f5fbff;
+
+}
+
+.admin-gallery-upload-zone.dragging{
+
+    border-color:#2ca7d8;
+
+    background:#eaf8ff;
+
+}
+
+.admin-gallery-upload-zone input{
+
+    display:none;
+
+}
+
+.admin-gallery-upload-icon{
+
+    font-size:55px;
+
+}
+
+.admin-gallery-selected{
+
+    margin-top:30px;
+
+}
+
+.admin-gallery-selected-heading{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.admin-gallery-preview-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fill,minmax(150px,1fr));
+
+    gap:18px;
+
+}
+
+.admin-gallery-preview-card{
+
+    position:relative;
+
+    background:white;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    box-shadow:
+    0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.admin-gallery-preview-card img{
+
+    width:100%;
+
+    height:150px;
+
+    object-fit:cover;
+
+    display:block;
+
+}
+
+.admin-gallery-preview-card span{
+
+    display:block;
+
+    padding:10px;
+
+    font-size:13px;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    white-space:nowrap;
+
+}
+
+.admin-gallery-preview-card button{
+
+    position:absolute;
+
+    top:8px;
+
+    right:8px;
+
+    width:32px;
+
+    height:32px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#ff4f4f;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+}
+
+/* ========================= */
+
+.admin-gallery-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fill,minmax(280px,1fr));
+
+    gap:25px;
+
+}
+
+.admin-gallery-card{
+
+    background:white;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    box-shadow:
+    0 15px 35px rgba(0,0,0,.07);
+
+    transition:.25s;
+
+}
+
+.admin-gallery-card:hover{
+
+    transform:translateY(-4px);
+
+}
+
+.admin-gallery-card-image{
+
+    position:relative;
+
+}
+
+.admin-gallery-card-image img{
+
+    width:100%;
+
+    height:220px;
+
+    object-fit:cover;
+
+    display:block;
+
+}
+
+.admin-gallery-card-content{
+
+    padding:20px;
+
+}
+
+.admin-gallery-card-category{
+
+    display:inline-block;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    background:#eaf7fc;
+
+    color:#2ca7d8;
+
+    font-size:12px;
+
+    margin-bottom:10px;
+
+}
+
+.admin-gallery-card-content h3{
+
+    margin:10px 0;
+
+}
+
+.admin-gallery-card-content time{
+
+    color:#777;
+
+    font-size:13px;
+
+}
+
+.admin-gallery-card-actions{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-top:20px;
+
+}
+
+.admin-gallery-card-actions button{
+
+    flex:1;
+
+}
+
+/* ========================= */
+
+.admin-gallery-edit-modal,
+
+.admin-confirm-modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.55);
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:25px;
+
+    z-index:999;
+
+}
+
+.admin-gallery-edit-modal.active,
+
+.admin-confirm-modal.active{
+
+    display:flex;
+
+}
+
+.admin-gallery-edit-card,
+
+.admin-confirm-card{
+
+    width:100%;
+
+    max-width:600px;
+
+    background:white;
+
+    border-radius:25px;
+
+    padding:30px;
+
+}
+
+.admin-gallery-edit-preview{
+
+    margin:25px 0;
+
+}
+
+.admin-gallery-edit-preview img{
+
+    width:100%;
+
+    border-radius:18px;
+
+}
+
+.admin-confirm-card{
+
+    text-align:center;
+
+}
+
+.admin-confirm-icon{
+
+    width:70px;
+
+    height:70px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    background:#ffefef;
+
+    color:#ff4f4f;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:34px;
+
+    font-weight:bold;
+
+}
+
+.admin-confirm-actions{
+
+    display:flex;
+
+    gap:15px;
+
+    margin-top:30px;
+
+}
+
+.admin-confirm-actions button{
+
+    flex:1;
+
+}
+
+/* ========================= */
+
+@media(max-width:768px){
+
+.admin-gallery-grid{
+
+grid-template-columns:1fr;
+
+}
+
+.admin-gallery-preview-grid{
+
+grid-template-columns:
+repeat(2,1fr);
+
+}
+
+.admin-confirm-actions{
+
+flex-direction:column;
+
+}
+
+}
+
+/* =========================
+   ADMIN PRAYER REQUESTS
+========================= */
+
+.admin-prayer-controls {
+  margin-top: 30px;
+}
+
+.admin-prayer-filters {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 7px;
+  scrollbar-width: none;
+}
+
+.admin-prayer-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.admin-prayer-filter {
+  flex: 0 0 auto;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--admin-border);
+  background: var(--admin-white);
+  color: var(--admin-text);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-prayer-filter.active {
+  border-color: var(--admin-primary);
+  background: var(--admin-primary);
+  color: var(--admin-white);
+}
+
+.admin-prayer-section {
+  margin-top: 22px;
+}
+
+.admin-prayer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-prayer-card {
+  padding: 20px;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: 20px;
+}
+
+.admin-prayer-card.new {
+  border-left: 5px solid var(--admin-primary);
+  box-shadow: 0 12px 28px rgba(50, 174, 226, 0.08);
+}
+
+.admin-prayer-card.read {
+  opacity: 0.82;
+}
+
+.admin-prayer-card-top {
+  margin-bottom: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+
+.admin-prayer-status {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-prayer-status.new {
+  background: var(--admin-light-blue);
+  color: var(--admin-primary-dark);
+}
+
+.admin-prayer-status.read {
+  background: #eef0f2;
+  color: #6f7980;
+}
+
+.admin-prayer-card time {
+  color: #8a949d;
+  font-size: 12px;
+}
+
+.admin-prayer-card h3 {
+  margin-bottom: 10px;
+  color: var(--admin-text);
+  font-size: 20px;
+}
+
+.admin-prayer-card > p {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--admin-muted);
+  font-size: 14px;
+  line-height: 1.65;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.admin-prayer-card-actions {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+
+.admin-prayer-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(22, 37, 45, 0.58);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+}
+
+.admin-prayer-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.admin-prayer-modal-card {
+  width: 100%;
+  max-width: 620px;
+  max-height: 88vh;
+  padding: 26px;
+  overflow-y: auto;
+  background: var(--admin-white);
+  border-radius: 24px;
+}
+
+.admin-prayer-modal-meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 11px;
+  margin-bottom: 22px;
+}
+
+.admin-prayer-modal-meta > div {
+  padding: 15px;
+  background: var(--admin-background);
+  border-radius: 14px;
+}
+
+.admin-prayer-modal-meta span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--admin-muted);
+  font-size: 12px;
+}
+
+.admin-prayer-modal-meta strong {
+  color: var(--admin-text);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.admin-prayer-text {
+  padding: 20px;
+  background: var(--admin-light-blue);
+  border-radius: 17px;
+}
+
+.admin-prayer-text p {
+  white-space: pre-wrap;
+  color: var(--admin-text);
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.admin-prayer-modal-actions {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+@media (min-width: 700px) {
+  .admin-prayer-modal-meta {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .admin-prayer-modal-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* =========================
+   REAL DASHBOARD DATA
+========================= */
+
+.admin-stat-card {
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-stat-card.has-new-items {
+  border-color: rgba(203, 77, 77, 0.35);
+  background: #fff8f8;
+  box-shadow:
+    0 12px 30px rgba(203, 77, 77, 0.08);
+}
+
+.admin-dashboard-panels {
+  margin-top: 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.admin-dashboard-panel {
+  min-width: 0;
+}
+
+.admin-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.admin-panel-link {
+  color: var(--admin-primary-dark);
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.admin-dashboard-list {
+  overflow: hidden;
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: 20px;
+}
+
+.admin-dashboard-list-item {
+  min-height: 85px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  border-bottom: 1px solid var(--admin-border);
+  color: var(--admin-text);
+  text-decoration: none;
+}
+
+.admin-dashboard-list-item:last-child {
+  border-bottom: none;
+}
+
+.admin-dashboard-item-icon,
+.admin-dashboard-item-image {
+  width: 50px;
+  height: 50px;
+  flex: 0 0 50px;
+  border-radius: 15px;
+}
+
+.admin-dashboard-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--admin-light-blue);
+  color: var(--admin-primary);
+  font-size: 23px;
+}
+
+.admin-dashboard-item-icon.prayer {
+  background: #fff0f0;
+  color: #c84a4a;
+}
+
+.admin-dashboard-item-image {
+  display: block;
+  object-fit: cover;
+  background: var(--admin-light-blue);
+}
+
+.admin-dashboard-item-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-dashboard-item-content strong,
+.admin-dashboard-item-content span,
+.admin-dashboard-item-content small {
+  display: block;
+}
+
+.admin-dashboard-item-content strong {
+  margin-bottom: 5px;
+  color: var(--admin-text);
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.admin-dashboard-item-content span {
+  color: var(--admin-muted);
+  font-size: 12px;
+}
+
+.admin-dashboard-item-content small {
+  margin-top: 5px;
+  overflow: hidden;
+  color: #8a949d;
+  font-size: 12px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-dashboard-prayer-text {
+  display: -webkit-box !important;
+  white-space: normal !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.admin-dashboard-arrow {
+  margin-left: auto;
+  color: var(--admin-primary);
+  font-size: 20px;
+}
+
+.admin-dashboard-loading,
+.admin-dashboard-empty {
+  padding: 30px 18px;
+  color: var(--admin-muted);
+  text-align: center;
+  font-size: 14px;
+}
+
+@media (min-width: 950px) {
+  .admin-dashboard-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  .admin-dashboard-panel:last-child {
+    grid-column: 1 / -1;
+  }
+}

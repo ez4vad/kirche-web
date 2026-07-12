@@ -110,6 +110,71 @@ const uploadNewsImage = multer({
 });
 
 /* =========================
+   ЗАГРУЗКА ФОТО ГАЛЕРЕИ
+========================= */
+
+const galleryUploadsDirectory = path.join(
+  projectRoot,
+  "uploads",
+  "gallery"
+);
+
+fs.mkdirSync(galleryUploadsDirectory, {
+  recursive: true
+});
+
+const galleryImageStorage = multer.diskStorage({
+  destination(req, file, callback) {
+    callback(null, galleryUploadsDirectory);
+  },
+
+  filename(req, file, callback) {
+    const extension =
+      allowedNewsImageTypes.get(file.mimetype);
+
+    if (!extension) {
+      callback(
+        new Error(
+          "Разрешены только JPG, PNG и WEBP."
+        )
+      );
+
+      return;
+    }
+
+    const filename =
+      `${Date.now()}-${crypto.randomUUID()}${extension}`;
+
+    callback(null, filename);
+  }
+});
+
+const uploadGalleryImages = multer({
+  storage: galleryImageStorage,
+
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+    files: 20
+  },
+
+  fileFilter(req, file, callback) {
+    if (
+      !allowedNewsImageTypes.has(file.mimetype)
+    ) {
+      callback(
+        new Error(
+          "Разрешены только JPG, PNG и WEBP."
+        )
+      );
+
+      return;
+    }
+
+    callback(null, true);
+  }
+});
+
+/* =========================
    ПОДГОТОВКА ДАННЫХ СОБЫТИЙ
 ========================= */
 
@@ -205,6 +270,30 @@ function normalizeNews(row) {
     author: row.author,
     date: row.publication_date,
     published: Boolean(row.published),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  };
+}
+function normalizeGalleryItem(row) {
+  return {
+    id: row.id,
+    image: row.image,
+    title: row.title,
+    category: row.category,
+    published: Boolean(row.published),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  };
+}
+
+function normalizePrayerRequest(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    contact: row.contact,
+    request: row.request_text,
+    anonymous: Boolean(row.anonymous),
+    status: row.status,
     createdAt: row.created_at,
     updatedAt: row.updated_at
   };
@@ -920,7 +1009,560 @@ app.delete(
     }
   }
 );
+/* =========================
+   ПУБЛИЧНАЯ ГАЛЕРЕЯ
+========================= */
 
+app.get("/api/gallery", (req, res) => {
+  try {
+    const rows = db
+      .prepare(`
+        SELECT *
+        FROM gallery
+        WHERE published = 1
+        ORDER BY created_at DESC, id DESC
+      `)
+      .all();
+
+    res.json(
+      rows.map(normalizeGalleryItem)
+    );
+  } catch (error) {
+    console.error(
+      "Ошибка загрузки галереи:",
+      error
+    );
+
+    res.status(500).json({
+      error:
+        "Не удалось загрузить галерею."
+    });
+  }
+});
+
+/* =========================
+   ГАЛЕРЕЯ В АДМИНКЕ
+========================= */
+
+app.get(
+  "/api/admin/gallery",
+  (req, res) => {
+    try {
+      const rows = db
+        .prepare(`
+          SELECT *
+          FROM gallery
+          ORDER BY created_at DESC, id DESC
+        `)
+        .all();
+
+      res.json(
+        rows.map(normalizeGalleryItem)
+      );
+    } catch (error) {
+      console.error(
+        "Ошибка загрузки галереи:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Не удалось загрузить фотографии."
+      });
+    }
+  }
+);
+
+/* =========================
+   ЗАГРУЗКА НЕСКОЛЬКИХ ФОТО
+========================= */
+
+app.post(
+  "/api/admin/gallery/upload",
+  uploadGalleryImages.array("images", 20),
+  (req, res) => {
+    try {
+      if (
+        !req.files ||
+        req.files.length === 0
+      ) {
+        return res.status(400).json({
+          error:
+            "Фотографии не были выбраны."
+        });
+      }
+
+      const title = String(
+        req.body.title || ""
+      ).trim();
+
+      const category = String(
+        req.body.category || "Община"
+      ).trim();
+
+      const insertPhoto = db.prepare(`
+        INSERT INTO gallery (
+          image,
+          title,
+          category,
+          published
+        )
+        VALUES (?, ?, ?, 1)
+      `);
+
+      const insertMany =
+        db.transaction((files) => {
+          return files.map((file) => {
+            const imagePath =
+              `/uploads/gallery/${file.filename}`;
+
+            const result = insertPhoto.run(
+              imagePath,
+              title,
+              category
+            );
+
+            const row = db
+              .prepare(`
+                SELECT *
+                FROM gallery
+                WHERE id = ?
+              `)
+              .get(result.lastInsertRowid);
+
+            return normalizeGalleryItem(row);
+          });
+        });
+
+      const createdItems =
+        insertMany(req.files);
+
+      res.status(201).json(createdItems);
+    } catch (error) {
+      console.error(
+        "Ошибка загрузки фотографий:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Не удалось сохранить фотографии."
+      });
+    }
+  }
+);
+
+/* =========================
+   ИЗМЕНЕНИЕ ФОТОГРАФИИ
+========================= */
+
+app.put(
+  "/api/admin/gallery/:id",
+  (req, res) => {
+    try {
+      const galleryId =
+        Number(req.params.id);
+
+      if (!Number.isInteger(galleryId)) {
+        return res.status(400).json({
+          error:
+            "Некорректный ID фотографии."
+        });
+      }
+
+      const existingItem = db
+        .prepare(`
+          SELECT *
+          FROM gallery
+          WHERE id = ?
+        `)
+        .get(galleryId);
+
+      if (!existingItem) {
+        return res.status(404).json({
+          error:
+            "Фотография не найдена."
+        });
+      }
+
+      const title = String(
+        req.body.title ?? existingItem.title
+      ).trim();
+
+      const category = String(
+        req.body.category ??
+        existingItem.category
+      ).trim();
+
+      const published =
+        req.body.published !== false;
+
+      db.prepare(`
+        UPDATE gallery
+        SET
+          title = ?,
+          category = ?,
+          published = ?,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `).run(
+        title,
+        category,
+        published ? 1 : 0,
+        galleryId
+      );
+
+      const updatedItem = db
+        .prepare(`
+          SELECT *
+          FROM gallery
+          WHERE id = ?
+        `)
+        .get(galleryId);
+
+      res.json(
+        normalizeGalleryItem(updatedItem)
+      );
+    } catch (error) {
+      console.error(
+        "Ошибка изменения фотографии:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Не удалось изменить фотографию."
+      });
+    }
+  }
+);
+
+/* =========================
+   УДАЛЕНИЕ ФОТОГРАФИИ
+========================= */
+
+app.delete(
+  "/api/admin/gallery/:id",
+  (req, res) => {
+    try {
+      const galleryId =
+        Number(req.params.id);
+
+      if (!Number.isInteger(galleryId)) {
+        return res.status(400).json({
+          error:
+            "Некорректный ID фотографии."
+        });
+      }
+
+      const item = db
+        .prepare(`
+          SELECT *
+          FROM gallery
+          WHERE id = ?
+        `)
+        .get(galleryId);
+
+      if (!item) {
+        return res.status(404).json({
+          error:
+            "Фотография не найдена."
+        });
+      }
+
+      db.prepare(`
+        DELETE FROM gallery
+        WHERE id = ?
+      `).run(galleryId);
+
+      if (
+        item.image &&
+        item.image.startsWith(
+          "/uploads/gallery/"
+        )
+      ) {
+        const filename =
+          path.basename(item.image);
+
+        const filePath = path.join(
+          galleryUploadsDirectory,
+          filename
+        );
+
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      }
+
+      res.status(204).send();
+    } catch (error) {
+      console.error(
+        "Ошибка удаления фотографии:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Не удалось удалить фотографию."
+      });
+    }
+  }
+);
+
+/* =========================
+   ОТПРАВКА МОЛИТВЕННОГО ЗАПРОСА
+========================= */
+
+app.post("/api/prayer-requests", (req, res) => {
+  try {
+    const name = String(
+      req.body.name || ""
+    ).trim();
+
+    const contact = String(
+      req.body.contact || ""
+    ).trim();
+
+    const requestText = String(
+      req.body.request || ""
+    ).trim();
+
+    const anonymous =
+      req.body.anonymous === true;
+
+    if (requestText.length < 10) {
+      return res.status(400).json({
+        error:
+          "Молитвенный запрос должен содержать минимум 10 символов."
+      });
+    }
+
+    if (requestText.length > 2000) {
+      return res.status(400).json({
+        error:
+          "Молитвенный запрос слишком длинный."
+      });
+    }
+
+    const savedName = anonymous
+      ? ""
+      : name;
+
+    const result = db
+      .prepare(`
+        INSERT INTO prayer_requests (
+          name,
+          contact,
+          request_text,
+          anonymous,
+          status
+        )
+        VALUES (?, ?, ?, ?, 'new')
+      `)
+      .run(
+        savedName,
+        contact,
+        requestText,
+        anonymous ? 1 : 0
+      );
+
+    const createdRequest = db
+      .prepare(`
+        SELECT *
+        FROM prayer_requests
+        WHERE id = ?
+      `)
+      .get(result.lastInsertRowid);
+
+    res.status(201).json({
+      message:
+        "Молитвенный запрос успешно отправлен.",
+      request: normalizePrayerRequest(
+        createdRequest
+      )
+    });
+  } catch (error) {
+    console.error(
+      "Ошибка отправки молитвенного запроса:",
+      error
+    );
+
+    res.status(500).json({
+      error:
+        "Не удалось отправить молитвенный запрос."
+    });
+  }
+});
+
+/* =========================
+   ЗАПРОСЫ В АДМИНКЕ
+========================= */
+
+app.get(
+  "/api/admin/prayer-requests",
+  (req, res) => {
+    try {
+      const rows = db
+        .prepare(`
+          SELECT *
+          FROM prayer_requests
+          ORDER BY
+            CASE
+              WHEN status = 'new' THEN 0
+              ELSE 1
+            END,
+            created_at DESC,
+            id DESC
+        `)
+        .all();
+
+      res.json(
+        rows.map(normalizePrayerRequest)
+      );
+    } catch (error) {
+      console.error(
+        "Ошибка загрузки молитвенных запросов:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Не удалось загрузить молитвенные запросы."
+      });
+    }
+  }
+);
+
+/* =========================
+   ИЗМЕНЕНИЕ СТАТУСА
+========================= */
+
+app.patch(
+  "/api/admin/prayer-requests/:id/status",
+  (req, res) => {
+    try {
+      const requestId =
+        Number(req.params.id);
+
+      const status =
+        String(req.body.status || "");
+
+      if (!Number.isInteger(requestId)) {
+        return res.status(400).json({
+          error:
+            "Некорректный ID запроса."
+        });
+      }
+
+      if (
+        status !== "new" &&
+        status !== "read"
+      ) {
+        return res.status(400).json({
+          error:
+            "Некорректный статус запроса."
+        });
+      }
+
+      const existingRequest = db
+        .prepare(`
+          SELECT id
+          FROM prayer_requests
+          WHERE id = ?
+        `)
+        .get(requestId);
+
+      if (!existingRequest) {
+        return res.status(404).json({
+          error:
+            "Молитвенный запрос не найден."
+        });
+      }
+
+      db.prepare(`
+        UPDATE prayer_requests
+        SET
+          status = ?,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `).run(
+        status,
+        requestId
+      );
+
+      const updatedRequest = db
+        .prepare(`
+          SELECT *
+          FROM prayer_requests
+          WHERE id = ?
+        `)
+        .get(requestId);
+
+      res.json(
+        normalizePrayerRequest(
+          updatedRequest
+        )
+      );
+    } catch (error) {
+      console.error(
+        "Ошибка изменения статуса:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Не удалось изменить статус запроса."
+      });
+    }
+  }
+);
+
+/* =========================
+   УДАЛЕНИЕ ЗАПРОСА
+========================= */
+
+app.delete(
+  "/api/admin/prayer-requests/:id",
+  (req, res) => {
+    try {
+      const requestId =
+        Number(req.params.id);
+
+      if (!Number.isInteger(requestId)) {
+        return res.status(400).json({
+          error:
+            "Некорректный ID запроса."
+        });
+      }
+
+      const result = db
+        .prepare(`
+          DELETE FROM prayer_requests
+          WHERE id = ?
+        `)
+        .run(requestId);
+
+      if (result.changes === 0) {
+        return res.status(404).json({
+          error:
+            "Молитвенный запрос не найден."
+        });
+      }
+
+      res.status(204).send();
+    } catch (error) {
+      console.error(
+        "Ошибка удаления запроса:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Не удалось удалить молитвенный запрос."
+      });
+    }
+  }
+);
 /* =========================
    ОБРАБОТКА ОШИБОК ЗАГРУЗКИ
 ========================= */

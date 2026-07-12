@@ -45,95 +45,93 @@
   </nav>
 </header>
 
-<main class="gallery-page">
+<section class="gallery-page">
 
-  <section class="gallery-hero">
-    <p class="about-label">Жизнь церкви</p>
+  <div class="gallery-hero">
+    <span class="about-label">
+      Жизнь церкви
+    </span>
 
     <h1>Галерея</h1>
 
     <p>
-      Фотографии богослужений, молодёжных встреч,
+      Фотографии служений, встреч, молодёжи,
       детских мероприятий и жизни нашей общины.
     </p>
-  </section>
+  </div>
 
-  <section class="gallery-section">
+  <div class="gallery-filters" id="galleryFilters">
 
-    <div class="gallery-filters" aria-label="Категории галереи">
-      <button
-        class="gallery-filter active"
-        type="button"
-        data-filter="all"
-      >
-        Все
-      </button>
+    <button
+      type="button"
+      class="gallery-filter active"
+      data-category="all"
+    >
+      Все
+    </button>
 
-      <button
-        class="gallery-filter"
-        type="button"
-        data-filter="service"
-      >
-        Богослужения
-      </button>
+    <button
+      type="button"
+      class="gallery-filter"
+      data-category="Богослужения"
+    >
+      Богослужения
+    </button>
 
-      <button
-        class="gallery-filter"
-        type="button"
-        data-filter="youth"
-      >
-        Молодёжь
-      </button>
+    <button
+      type="button"
+      class="gallery-filter"
+      data-category="Молодёжь"
+    >
+      Молодёжь
+    </button>
 
-      <button
-        class="gallery-filter"
-        type="button"
-        data-filter="kids"
-      >
-        Дети
-      </button>
+    <button
+      type="button"
+      class="gallery-filter"
+      data-category="Дети"
+    >
+      Дети
+    </button>
 
-      <button
-        class="gallery-filter"
-        type="button"
-        data-filter="events"
-      >
-        Мероприятия
-      </button>
+    <button
+      type="button"
+      class="gallery-filter"
+      data-category="Мероприятия"
+    >
+      Мероприятия
+    </button>
+
+    <button
+      type="button"
+      class="gallery-filter"
+      data-category="Община"
+    >
+      Община
+    </button>
+
+  </div>
+
+  <div
+    class="gallery-grid"
+    id="galleryGrid"
+  >
+    <div class="gallery-message">
+      Загрузка фотографий...
     </div>
+  </div>
 
-    <div class="gallery-grid" id="galleryGrid"></div>
+</section>
 
-  </section>
 
-</main>
-
-<footer class="footer">
-  <p>© 2026 Philadelphia Christengemeinde Bremen</p>
-</footer>
 
 <div
   class="gallery-modal"
   id="galleryModal"
   aria-hidden="true"
 >
-  <button
-    class="gallery-modal-close"
-    id="galleryModalClose"
-    type="button"
-    aria-label="Закрыть фотографию"
-  >
-    ×
-  </button>
 
-  <button
-    class="gallery-modal-arrow gallery-modal-prev"
-    id="galleryModalPrev"
-    type="button"
-    aria-label="Предыдущая фотография"
-  >
-    ‹
-  </button>
+
 
   <figure class="gallery-modal-figure">
     <img
@@ -145,14 +143,7 @@
     <figcaption id="galleryModalCaption"></figcaption>
   </figure>
 
-  <button
-    class="gallery-modal-arrow gallery-modal-next"
-    id="galleryModalNext"
-    type="button"
-    aria-label="Следующая фотография"
-  >
-    ›
-  </button>
+ 
 </div>
 <footer class="footer">
   <div class="footer-container">
@@ -280,6 +271,7 @@
     <p>Сделано с <span>♥</span></p>
   </div>
 </footer>
+<script src="js/script.js"></script>
 <script src="js/gallery.js"></script>
 
 </body>

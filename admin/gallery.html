@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Управление галереей | Philadelphia</title>
+
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body class="admin-dashboard-page">
+
+  <div class="admin-layout">
+
+    <aside
+      class="admin-sidebar"
+      id="adminSidebar"
+    >
+
+      <div class="admin-sidebar-top">
+
+        <a
+          href="../index.html"
+          class="admin-sidebar-logo"
+        >
+          <img
+            src="../images/logo.png"
+            alt="Philadelphia"
+          >
+        </a>
+
+        <button
+          class="admin-sidebar-close"
+          id="adminSidebarClose"
+          type="button"
+          aria-label="Закрыть меню"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <nav class="admin-navigation">
+
+        <a
+          href="dashboard.html"
+          class="admin-nav-link"
+        >
+          <span>⌂</span>
+          Главная
+        </a>
+
+        <a
+          href="events.html"
+          class="admin-nav-link"
+        >
+          <span>◫</span>
+          События
+        </a>
+
+        <a
+          href="news.html"
+          class="admin-nav-link"
+        >
+          <span>▤</span>
+          Новости
+        </a>
+
+        <a
+          href="gallery.html"
+          class="admin-nav-link active"
+        >
+          <span>▦</span>
+          Галерея
+        </a>
+
+        <a
+          href="prayer.html"
+          class="admin-nav-link"
+        >
+          <span>♡</span>
+          Молитвенные запросы
+        </a>
+
+        <a
+          href="settings.html"
+          class="admin-nav-link"
+        >
+          <span>⚙</span>
+          Настройки
+        </a>
+
+      </nav>
+
+      <div class="admin-sidebar-bottom">
+
+        <a
+          href="../gallery.html"
+          class="admin-site-link"
+          target="_blank"
+          rel="noopener"
+        >
+          Открыть галерею
+        </a>
+
+        <button
+          class="admin-logout-button"
+          id="adminLogoutButton"
+          type="button"
+        >
+          Выйти
+        </button>
+
+      </div>
+
+    </aside>
+
+    <div
+      class="admin-sidebar-overlay"
+      id="adminSidebarOverlay"
+    ></div>
+
+    <main class="admin-main">
+
+      <header class="admin-topbar">
+
+        <button
+          class="admin-menu-button"
+          id="adminMenuButton"
+          type="button"
+          aria-label="Открыть меню"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="admin-topbar-title">
+          <span>Панель управления</span>
+          <strong>Галерея</strong>
+        </div>
+
+        <div class="admin-profile">
+          <div class="admin-avatar">
+            A
+          </div>
+        </div>
+
+      </header>
+
+      <section class="admin-dashboard-content">
+
+        <div class="admin-page-heading">
+
+          <div>
+
+            <span class="admin-section-label">
+              Фотографии церкви
+            </span>
+
+            <h1>
+              Управление галереей
+            </h1>
+
+            <p>
+              Загружайте фотографии, выбирайте категории,
+              изменяйте названия и удаляйте изображения.
+            </p>
+
+          </div>
+
+          <button
+            class="admin-primary-button"
+            id="openGalleryFormButton"
+            type="button"
+          >
+            + Добавить фотографии
+          </button>
+
+        </div>
+
+        <!-- ФОРМА ЗАГРУЗКИ -->
+
+        <section
+          class="admin-gallery-form-section"
+          id="galleryFormSection"
+          hidden
+        >
+
+          <div class="admin-form-card">
+
+            <div class="admin-form-card-heading">
+
+              <div>
+
+                <span>
+                  Новые изображения
+                </span>
+
+                <h2>
+                  Загрузить фотографии
+                </h2>
+
+              </div>
+
+              <button
+                class="admin-form-close"
+                id="closeGalleryFormButton"
+                type="button"
+                aria-label="Закрыть форму"
+              >
+                ×
+              </button>
+
+            </div>
+
+            <form
+              id="galleryUploadForm"
+              novalidate
+            >
+
+              <div class="admin-form-group">
+
+                <label for="galleryCategory">
+                  Категория
+                </label>
+
+                <select id="galleryCategory">
+
+                  <option value="Богослужения">
+                    Богослужения
+                  </option>
+
+                  <option value="Молодёжь">
+                    Молодёжь
+                  </option>
+
+                  <option value="Дети">
+                    Дети
+                  </option>
+
+                  <option value="Мероприятия">
+                    Мероприятия
+                  </option>
+
+                  <option value="Община">
+                    Община
+                  </option>
+
+                </select>
+
+              </div>
+
+              <div class="admin-form-group">
+
+                <label for="galleryTitle">
+                  Общее название
+                </label>
+
+                <input
+                  type="text"
+                  id="galleryTitle"
+                  maxlength="150"
+                  placeholder="Например: Воскресное служение"
+                >
+
+                <small>
+                  Это название будет применено ко всем выбранным фотографиям.
+                  Поле можно оставить пустым.
+                </small>
+
+              </div>
+
+              <div class="admin-form-group">
+
+                <label>
+                  Фотографии
+                </label>
+
+                <label
+                  class="admin-gallery-upload-zone"
+                  id="galleryUploadZone"
+                  for="galleryFiles"
+                >
+
+                  <input
+                    type="file"
+                    id="galleryFiles"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                  >
+
+                  <span class="admin-gallery-upload-icon">
+                    📷
+                  </span>
+
+                  <strong>
+                    Выбрать фотографии
+                  </strong>
+
+                  <small>
+                    Можно выбрать сразу несколько файлов
+                  </small>
+
+                  <small>
+                    JPG, PNG или WEBP · максимум 5 МБ каждый
+                  </small>
+
+                </label>
+
+              </div>
+
+              <div
+                class="admin-gallery-selected"
+                id="gallerySelectedSection"
+                hidden
+              >
+
+                <div class="admin-gallery-selected-heading">
+
+                  <h3>
+                    Выбранные фотографии
+                  </h3>
+
+                  <button
+                    type="button"
+                    id="clearGallerySelectionButton"
+                  >
+                    Очистить
+                  </button>
+
+                </div>
+
+                <div
+                  class="admin-gallery-preview-grid"
+                  id="galleryPreviewGrid"
+                ></div>
+
+              </div>
+
+              <p
+                class="admin-upload-status"
+                id="galleryUploadStatus"
+              ></p>
+
+              <p
+                class="admin-form-error"
+                id="galleryFormError"
+              ></p>
+
+              <div class="admin-form-actions">
+
+                <button
+                  class="admin-secondary-button"
+                  id="cancelGalleryUploadButton"
+                  type="button"
+                >
+                  Отмена
+                </button>
+
+                <button
+                  class="admin-primary-button"
+                  id="uploadGalleryButton"
+                  type="submit"
+                >
+                  Загрузить фотографии
+                </button>
+
+              </div>
+
+            </form>
+
+          </div>
+
+        </section>
+
+        <!-- ФИЛЬТРЫ -->
+
+        <section class="admin-gallery-controls">
+
+          <div class="admin-section-heading">
+
+            <div>
+              <span>Медиатека</span>
+              <h2>Все фотографии</h2>
+            </div>
+
+            <strong
+              class="admin-items-count"
+              id="galleryCount"
+            >
+              0
+            </strong>
+
+          </div>
+
+          <div class="admin-gallery-toolbar">
+
+            <div class="admin-form-group">
+
+              <label for="galleryFilter">
+                Категория
+              </label>
+
+              <select id="galleryFilter">
+
+                <option value="all">
+                  Все категории
+                </option>
+
+                <option value="Богослужения">
+                  Богослужения
+                </option>
+
+                <option value="Молодёжь">
+                  Молодёжь
+                </option>
+
+                <option value="Дети">
+                  Дети
+                </option>
+
+                <option value="Мероприятия">
+                  Мероприятия
+                </option>
+
+                <option value="Община">
+                  Община
+                </option>
+
+              </select>
+
+            </div>
+
+            <div class="admin-form-group">
+
+              <label for="gallerySearch">
+                Поиск
+              </label>
+
+              <input
+                type="search"
+                id="gallerySearch"
+                placeholder="По названию..."
+              >
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- СПИСОК ФОТОГРАФИЙ -->
+
+        <section class="admin-gallery-section">
+
+          <div
+            class="admin-gallery-grid"
+            id="adminGalleryGrid"
+          >
+            <div class="admin-empty-state">
+
+              <div>…</div>
+
+              <h3>
+                Загрузка
+              </h3>
+
+              <p>
+                Получаем фотографии с сервера...
+              </p>
+
+            </div>
+          </div>
+
+          <div
+            class="admin-empty-state"
+            id="galleryEmptyState"
+            hidden
+          >
+
+            <div>▦</div>
+
+            <h3>
+              Фотографий пока нет
+            </h3>
+
+            <p>
+              Нажмите «Добавить фотографии»,
+              чтобы загрузить первые изображения.
+            </p>
+
+          </div>
+
+        </section>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ -->
+
+  <div
+    class="admin-gallery-edit-modal"
+    id="editGalleryModal"
+    aria-hidden="true"
+  >
+
+    <div class="admin-gallery-edit-card">
+
+      <div class="admin-form-card-heading">
+
+        <div>
+          <span>
+            Редактирование
+          </span>
+
+          <h2>
+            Изменить фотографию
+          </h2>
+        </div>
+
+        <button
+          class="admin-form-close"
+          id="closeEditGalleryButton"
+          type="button"
+          aria-label="Закрыть"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div class="admin-gallery-edit-preview">
+
+        <img
+          id="editGalleryImage"
+          src=""
+          alt=""
+        >
+
+      </div>
+
+      <form
+        id="editGalleryForm"
+        novalidate
+      >
+
+        <input
+          type="hidden"
+          id="editGalleryId"
+        >
+
+        <div class="admin-form-group">
+
+          <label for="editGalleryTitle">
+            Название
+          </label>
+
+          <input
+            type="text"
+            id="editGalleryTitle"
+            maxlength="150"
+            placeholder="Название фотографии"
+          >
+
+        </div>
+
+        <div class="admin-form-group">
+
+          <label for="editGalleryCategory">
+            Категория
+          </label>
+
+          <select id="editGalleryCategory">
+
+            <option value="Богослужения">
+              Богослужения
+            </option>
+
+            <option value="Молодёжь">
+              Молодёжь
+            </option>
+
+            <option value="Дети">
+              Дети
+            </option>
+
+            <option value="Мероприятия">
+              Мероприятия
+            </option>
+
+            <option value="Община">
+              Община
+            </option>
+
+          </select>
+
+        </div>
+
+        <label class="admin-checkbox-row">
+
+          <input
+            type="checkbox"
+            id="editGalleryPublished"
+            checked
+          >
+
+          <span></span>
+
+          <strong>
+            Показывать фотографию на сайте
+          </strong>
+
+        </label>
+
+        <p
+          class="admin-form-error"
+          id="editGalleryError"
+        ></p>
+
+        <div class="admin-form-actions">
+
+          <button
+            class="admin-secondary-button"
+            id="cancelEditGalleryButton"
+            type="button"
+          >
+            Отмена
+          </button>
+
+          <button
+            class="admin-primary-button"
+            type="submit"
+          >
+            Сохранить
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <!-- ПОДТВЕРЖДЕНИЕ УДАЛЕНИЯ -->
+
+  <div
+    class="admin-confirm-modal"
+    id="deleteGalleryModal"
+    aria-hidden="true"
+  >
+
+    <div class="admin-confirm-card">
+
+      <div class="admin-confirm-icon">
+        !
+      </div>
+
+      <h2>
+        Удалить фотографию?
+      </h2>
+
+      <p>
+        Фотография будет удалена из базы данных
+        и из папки uploads.
+      </p>
+
+      <div class="admin-confirm-actions">
+
+        <button
+          class="admin-secondary-button"
+          id="cancelDeleteGalleryButton"
+          type="button"
+        >
+          Отмена
+        </button>
+
+        <button
+          class="admin-danger-button"
+          id="confirmDeleteGalleryButton"
+          type="button"
+        >
+          Удалить
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="js/gallery-admin.js"></script>
+
+</body>
+</html>

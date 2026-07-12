@@ -48,4 +48,37 @@ db.exec(`
   )
 `);
 
+/* =========================
+   ГАЛЕРЕЯ
+========================= */
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS gallery (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    image TEXT NOT NULL,
+    title TEXT DEFAULT '',
+    category TEXT DEFAULT 'Община',
+    published INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+
+/* =========================
+   МОЛИТВЕННЫЕ ЗАПРОСЫ
+========================= */
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS prayer_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT DEFAULT '',
+    contact TEXT DEFAULT '',
+    request_text TEXT NOT NULL,
+    anonymous INTEGER NOT NULL DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'new',
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+
 module.exports = db;
