@@ -1396,3 +1396,165 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 9px;
 }
+
+/* =========================
+   NEWS IMAGE UPLOAD
+========================= */
+
+.admin-image-upload {
+  min-height: 180px;
+  padding: 25px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  border: 2px dashed var(--admin-border);
+  border-radius: 18px;
+
+  background: var(--admin-background);
+  color: var(--admin-text);
+
+  text-align: center;
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.admin-image-upload:hover {
+  border-color: var(--admin-primary);
+  background: var(--admin-light-blue);
+}
+
+.admin-image-upload.uploading {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.admin-image-upload input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.admin-image-upload-icon {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--admin-light-blue);
+  border-radius: 18px;
+
+  font-size: 27px;
+}
+
+.admin-image-upload strong {
+  font-size: 16px;
+}
+
+.admin-image-upload small {
+  color: var(--admin-muted);
+  font-size: 12px;
+}
+
+.admin-upload-status {
+  min-height: 20px;
+  margin-top: 9px;
+  font-size: 13px;
+}
+
+.admin-upload-status.loading {
+  color: var(--admin-primary-dark);
+}
+
+.admin-upload-status.success {
+  color: #28824a;
+}
+
+.admin-upload-status.error {
+  color: var(--admin-danger);
+}
+
+.admin-news-preview {
+  position: relative;
+  margin: -5px 0 22px;
+  padding: 10px;
+
+  overflow: hidden;
+
+  background: var(--admin-background);
+  border: 1px solid var(--admin-border);
+  border-radius: 18px;
+}
+
+.admin-news-preview img {
+  width: 100%;
+  max-height: 320px;
+
+  display: block;
+  object-fit: cover;
+
+  border-radius: 13px;
+}
+
+.admin-remove-image {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 10px;
+
+  border: 1px solid #f0d3d3;
+  background: #fff7f7;
+  color: #bf4747;
+
+  border-radius: 12px;
+
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
+#newsImageFile{
+
+    width:100%;
+    padding:14px;
+
+    border:1px solid #ddd;
+
+    border-radius:12px;
+
+    background:white;
+
+    cursor:pointer;
+
+}
+
+.admin-news-preview{
+
+    margin-top:15px;
+
+}
+
+.admin-news-preview img{
+
+    width:100%;
+
+    max-height:350px;
+
+    object-fit:cover;
+
+    border-radius:15px;
+
+    display:block;
+
+}

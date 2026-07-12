@@ -137,6 +137,9 @@ const newsAuthor =
 const newsImage =
   document.getElementById("newsImage");
 
+const newsImageFile =
+  document.getElementById("newsImageFile");
+
 const newsExcerpt =
   document.getElementById("newsExcerpt");
 
@@ -266,7 +269,27 @@ async function apiDeleteNews(id) {
     );
   }
 }
+async function apiUploadNewsImage(file) {
+  const formData = new FormData();
 
+  formData.append("image", file);
+
+  const response = await fetch(
+    "/api/admin/uploads/news",
+    {
+      method: "POST",
+      body: formData
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      await readErrorMessage(response)
+    );
+  }
+
+  return response.json();
+}
 /* =========================
    ПОМОЩНИКИ
 ========================= */
@@ -375,7 +398,7 @@ function renderNews() {
               item.image
                 ? `
                   <img
-                    src="../${escapeHtml(item.image)}"
+                    src="${escapeHtml(item.image)}"
                     alt="${escapeHtml(item.title)}"
                   >
                 `
@@ -481,6 +504,8 @@ function resetNewsForm() {
   newsForm.reset();
 
   newsId.value = "";
+  newsImage.value = "";
+  newsImageFile.value = "";
   newsPublished.checked = true;
 
   quill.setText("");
@@ -592,17 +617,68 @@ function updateImagePreview() {
     return;
   }
 
-  newsPreviewImage.src =
-    imagePath.startsWith("http")
-      ? imagePath
-      : `../${imagePath}`;
-
+  newsPreviewImage.src = imagePath;
   newsImagePreview.hidden = false;
 }
 
-newsImage.addEventListener(
-  "input",
-  updateImagePreview
+newsImageFile?.addEventListener(
+  "change",
+  async () => {
+    const file = newsImageFile.files[0];
+
+    if (!file) return;
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp"
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      alert(
+        "Выберите фотографию JPG, PNG или WEBP."
+      );
+
+      newsImageFile.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert(
+        "Фотография слишком большая. Максимум 5 МБ."
+      );
+
+      newsImageFile.value = "";
+      return;
+    }
+
+    newsImageFile.disabled = true;
+
+    try {
+      const result =
+        await apiUploadNewsImage(file);
+
+      newsImage.value = result.image;
+
+      updateImagePreview();
+    } catch (error) {
+      console.error(
+        "Ошибка загрузки фотографии:",
+        error
+      );
+
+      alert(
+        error.message ||
+        "Не удалось загрузить фотографию."
+      );
+
+      newsImage.value = "";
+      newsImageFile.value = "";
+      updateImagePreview();
+    } finally {
+      newsImageFile.disabled = false;
+    }
+  }
 );
 
 newsPreviewImage.addEventListener(
@@ -620,15 +696,15 @@ newsForm.addEventListener(
     if (formIsSubmitting) return;
 
     const data = {
-      title: newsTitle.value.trim(),
-      category: newsCategory.value,
-      date: newsDate.value,
-      author: newsAuthor.value.trim(),
-      image: newsImage.value.trim(),
-      excerpt: newsExcerpt.value.trim(),
-      content: getEditorHtml(),
-      published: newsPublished.checked
-    };
+  title: newsTitle?.value.trim() || "",
+  category: newsCategory?.value || "",
+  date: newsDate?.value || "",
+  author: newsAuthor?.value.trim() || "",
+  image: newsImage?.value.trim() || "",
+  excerpt: newsExcerpt?.value.trim() || "",
+  content: getEditorHtml(),
+  published: newsPublished?.checked ?? true
+};
 
     newsFormError.textContent = "";
 

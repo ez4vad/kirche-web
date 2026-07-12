@@ -1,16 +1,117 @@
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
+const crypto = require("crypto");
+const multer = require("multer");
+
 const db = require("./database");
 
 const app = express();
 const PORT = 3000;
+
 const projectRoot = path.join(__dirname, "..");
 
-// Позволяет серверу принимать JSON.
+/* =========================
+   ОСНОВНЫЕ НАСТРОЙКИ
+========================= */
+
 app.use(express.json());
 
-// Раздаём HTML, CSS, JS и изображения из основной папки проекта.
+/*
+  Раздаём обычные файлы сайта:
+  HTML, CSS, JS, images и другие папки.
+*/
 app.use(express.static(projectRoot));
+
+/* =========================
+   ЗАГРУЗКА ФОТОГРАФИЙ НОВОСТЕЙ
+========================= */
+
+const newsUploadsDirectory = path.join(
+  projectRoot,
+  "uploads",
+  "news"
+);
+
+/*
+  Если папки ещё нет, сервер создаст её сам.
+*/
+fs.mkdirSync(newsUploadsDirectory, {
+  recursive: true
+});
+
+/*
+  Явно разрешаем браузеру открывать файлы
+  по адресу /uploads/...
+*/
+app.use(
+  "/uploads",
+  express.static(
+    path.join(projectRoot, "uploads")
+  )
+);
+
+const allowedNewsImageTypes = new Map([
+  ["image/jpeg", ".jpg"],
+  ["image/png", ".png"],
+  ["image/webp", ".webp"]
+]);
+
+const newsImageStorage = multer.diskStorage({
+  destination(req, file, callback) {
+    callback(null, newsUploadsDirectory);
+  },
+
+  filename(req, file, callback) {
+    const extension =
+      allowedNewsImageTypes.get(file.mimetype);
+
+    if (!extension) {
+      callback(
+        new Error(
+          "Разрешены только JPG, PNG и WEBP."
+        )
+      );
+
+      return;
+    }
+
+    const filename =
+      `${Date.now()}-${crypto.randomUUID()}${extension}`;
+
+    callback(null, filename);
+  }
+});
+
+const uploadNewsImage = multer({
+  storage: newsImageStorage,
+
+  limits: {
+    fileSize: 5 * 1024 * 1024
+  },
+
+  fileFilter(req, file, callback) {
+    if (
+      !allowedNewsImageTypes.has(
+        file.mimetype
+      )
+    ) {
+      callback(
+        new Error(
+          "Разрешены только JPG, PNG и WEBP."
+        )
+      );
+
+      return;
+    }
+
+    callback(null, true);
+  }
+});
+
+/* =========================
+   ПОДГОТОВКА ДАННЫХ СОБЫТИЙ
+========================= */
 
 function normalizeEvent(row) {
   return {
@@ -22,36 +123,58 @@ function normalizeEvent(row) {
     description: row.description,
     published: Boolean(row.published),
     createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    updatedAt: row.updated_at
   };
 }
 
 function validateEvent(body) {
-  const title = String(body.title || "").trim();
-  const date = String(body.date || "").trim();
-  const time = String(body.time || "").trim();
-  const place = String(body.place || "").trim();
-  const description = String(body.description || "").trim();
-  const published = body.published !== false;
+  const title = String(
+    body.title || ""
+  ).trim();
+
+  const date = String(
+    body.date || ""
+  ).trim();
+
+  const time = String(
+    body.time || ""
+  ).trim();
+
+  const place = String(
+    body.place || ""
+  ).trim();
+
+  const description = String(
+    body.description || ""
+  ).trim();
+
+  const published =
+    body.published !== false;
 
   if (!title || !date || !time || !place) {
     return {
-      error: "Название, дата, время и адрес обязательны.",
+      error:
+        "Название, дата, время и адрес обязательны."
     };
   }
 
-  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-  const timePattern = /^\d{2}:\d{2}$/;
+  const datePattern =
+    /^\d{4}-\d{2}-\d{2}$/;
+
+  const timePattern =
+    /^\d{2}:\d{2}$/;
 
   if (!datePattern.test(date)) {
     return {
-      error: "Дата должна быть в формате YYYY-MM-DD.",
+      error:
+        "Дата должна быть в формате YYYY-MM-DD."
     };
   }
 
   if (!timePattern.test(time)) {
     return {
-      error: "Время должно быть в формате HH:MM.",
+      error:
+        "Время должно быть в формате HH:MM."
     };
   }
 
@@ -62,8 +185,28 @@ function validateEvent(body) {
       time,
       place,
       description,
-      published,
-    },
+      published
+    }
+  };
+}
+
+/* =========================
+   ПОДГОТОВКА ДАННЫХ НОВОСТЕЙ
+========================= */
+
+function normalizeNews(row) {
+  return {
+    id: row.id,
+    title: row.title,
+    category: row.category,
+    excerpt: row.excerpt,
+    content: row.content,
+    image: row.image,
+    author: row.author,
+    date: row.publication_date,
+    published: Boolean(row.published),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
   };
 }
 
@@ -99,14 +242,20 @@ function validateNews(body) {
   const published =
     body.published !== false;
 
-  if (!title || !excerpt || !content || !date) {
+  if (
+    !title ||
+    !excerpt ||
+    !content ||
+    !date
+  ) {
     return {
       error:
         "Заголовок, краткое описание, полный текст и дата обязательны."
     };
   }
 
-  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+  const datePattern =
+    /^\d{4}-\d{2}-\d{2}$/;
 
   if (!datePattern.test(date)) {
     return {
@@ -129,10 +278,10 @@ function validateNews(body) {
   };
 }
 
-/*
-  Получить опубликованные события для обычного сайта.
-  Пример: GET /api/events
-*/
+/* =========================
+   ПУБЛИЧНЫЕ СОБЫТИЯ
+========================= */
+
 app.get("/api/events", (req, res) => {
   try {
     const rows = db
@@ -144,218 +293,279 @@ app.get("/api/events", (req, res) => {
       `)
       .all();
 
-    res.json(rows.map(normalizeEvent));
+    res.json(
+      rows.map(normalizeEvent)
+    );
   } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: "Не удалось загрузить события.",
-    });
-  }
-});
-
-/*
-  Получить все события для админки,
-  включая скрытые.
-*/
-app.get("/api/admin/events", (req, res) => {
-  try {
-    const rows = db
-      .prepare(`
-        SELECT *
-        FROM events
-        ORDER BY event_date ASC, event_time ASC
-      `)
-      .all();
-
-    res.json(rows.map(normalizeEvent));
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: "Не удалось загрузить события.",
-    });
-  }
-});
-
-/*
-  Создать событие.
-  POST /api/admin/events
-*/
-app.post("/api/admin/events", (req, res) => {
-  try {
-    const validation = validateEvent(req.body);
-
-    if (validation.error) {
-      return res.status(400).json({
-        error: validation.error,
-      });
-    }
-
-    const event = validation.value;
-
-    const result = db
-      .prepare(`
-        INSERT INTO events (
-          title,
-          event_date,
-          event_time,
-          place,
-          description,
-          published
-        )
-        VALUES (?, ?, ?, ?, ?, ?)
-      `)
-      .run(
-        event.title,
-        event.date,
-        event.time,
-        event.place,
-        event.description,
-        event.published ? 1 : 0
-      );
-
-    const createdEvent = db
-      .prepare(`
-        SELECT *
-        FROM events
-        WHERE id = ?
-      `)
-      .get(result.lastInsertRowid);
-
-    res.status(201).json(normalizeEvent(createdEvent));
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: "Не удалось создать событие.",
-    });
-  }
-});
-
-/*
-  Изменить событие.
-  PUT /api/admin/events/:id
-*/
-app.put("/api/admin/events/:id", (req, res) => {
-  try {
-    const eventId = Number(req.params.id);
-
-    if (!Number.isInteger(eventId)) {
-      return res.status(400).json({
-        error: "Некорректный ID события.",
-      });
-    }
-
-    const existingEvent = db
-      .prepare(`
-        SELECT id
-        FROM events
-        WHERE id = ?
-      `)
-      .get(eventId);
-
-    if (!existingEvent) {
-      return res.status(404).json({
-        error: "Событие не найдено.",
-      });
-    }
-
-    const validation = validateEvent(req.body);
-
-    if (validation.error) {
-      return res.status(400).json({
-        error: validation.error,
-      });
-    }
-
-    const event = validation.value;
-
-    db.prepare(`
-      UPDATE events
-      SET
-        title = ?,
-        event_date = ?,
-        event_time = ?,
-        place = ?,
-        description = ?,
-        published = ?,
-        updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `).run(
-      event.title,
-      event.date,
-      event.time,
-      event.place,
-      event.description,
-      event.published ? 1 : 0,
-      eventId
+    console.error(
+      "Ошибка загрузки событий:",
+      error
     );
 
-    const updatedEvent = db
-      .prepare(`
-        SELECT *
-        FROM events
-        WHERE id = ?
-      `)
-      .get(eventId);
-
-    res.json(normalizeEvent(updatedEvent));
-  } catch (error) {
-    console.error(error);
-
     res.status(500).json({
-      error: "Не удалось обновить событие.",
-    });
-  }
-});
-
-/*
-  Удалить событие.
-  DELETE /api/admin/events/:id
-*/
-app.delete("/api/admin/events/:id", (req, res) => {
-  try {
-    const eventId = Number(req.params.id);
-
-    if (!Number.isInteger(eventId)) {
-      return res.status(400).json({
-        error: "Некорректный ID события.",
-      });
-    }
-
-    const result = db
-      .prepare(`
-        DELETE FROM events
-        WHERE id = ?
-      `)
-      .run(eventId);
-
-    if (result.changes === 0) {
-      return res.status(404).json({
-        error: "Событие не найдено.",
-      });
-    }
-
-    res.status(204).send();
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: "Не удалось удалить событие.",
+      error:
+        "Не удалось загрузить события."
     });
   }
 });
 
 /* =========================
+   СОБЫТИЯ В АДМИНКЕ
+========================= */
+
+app.get(
+  "/api/admin/events",
+  (req, res) => {
+    try {
+      const rows = db
+        .prepare(`
+          SELECT *
+          FROM events
+          ORDER BY event_date ASC, event_time ASC
+        `)
+        .all();
+
+      res.json(
+        rows.map(normalizeEvent)
+      );
+    } catch (error) {
+      console.error(
+        "Ошибка загрузки событий:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Не удалось загрузить события."
+      });
+    }
+  }
+);
+
+app.post(
+  "/api/admin/events",
+  (req, res) => {
+    try {
+      const validation =
+        validateEvent(req.body);
+
+      if (validation.error) {
+        return res.status(400).json({
+          error: validation.error
+        });
+      }
+
+      const event =
+        validation.value;
+
+      const result = db
+        .prepare(`
+          INSERT INTO events (
+            title,
+            event_date,
+            event_time,
+            place,
+            description,
+            published
+          )
+          VALUES (?, ?, ?, ?, ?, ?)
+        `)
+        .run(
+          event.title,
+          event.date,
+          event.time,
+          event.place,
+          event.description,
+          event.published ? 1 : 0
+        );
+
+      const createdEvent = db
+        .prepare(`
+          SELECT *
+          FROM events
+          WHERE id = ?
+        `)
+        .get(result.lastInsertRowid);
+
+      res
+        .status(201)
+        .json(
+          normalizeEvent(createdEvent)
+        );
+    } catch (error) {
+      console.error(
+        "Ошибка создания события:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Не удалось создать событие."
+      });
+    }
+  }
+);
+
+app.put(
+  "/api/admin/events/:id",
+  (req, res) => {
+    try {
+      const eventId =
+        Number(req.params.id);
+
+      if (!Number.isInteger(eventId)) {
+        return res.status(400).json({
+          error:
+            "Некорректный ID события."
+        });
+      }
+
+      const existingEvent = db
+        .prepare(`
+          SELECT id
+          FROM events
+          WHERE id = ?
+        `)
+        .get(eventId);
+
+      if (!existingEvent) {
+        return res.status(404).json({
+          error:
+            "Событие не найдено."
+        });
+      }
+
+      const validation =
+        validateEvent(req.body);
+
+      if (validation.error) {
+        return res.status(400).json({
+          error: validation.error
+        });
+      }
+
+      const event =
+        validation.value;
+
+      db.prepare(`
+        UPDATE events
+        SET
+          title = ?,
+          event_date = ?,
+          event_time = ?,
+          place = ?,
+          description = ?,
+          published = ?,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `).run(
+        event.title,
+        event.date,
+        event.time,
+        event.place,
+        event.description,
+        event.published ? 1 : 0,
+        eventId
+      );
+
+      const updatedEvent = db
+        .prepare(`
+          SELECT *
+          FROM events
+          WHERE id = ?
+        `)
+        .get(eventId);
+
+      res.json(
+        normalizeEvent(updatedEvent)
+      );
+    } catch (error) {
+      console.error(
+        "Ошибка обновления события:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Не удалось обновить событие."
+      });
+    }
+  }
+);
+
+app.delete(
+  "/api/admin/events/:id",
+  (req, res) => {
+    try {
+      const eventId =
+        Number(req.params.id);
+
+      if (!Number.isInteger(eventId)) {
+        return res.status(400).json({
+          error:
+            "Некорректный ID события."
+        });
+      }
+
+      const result = db
+        .prepare(`
+          DELETE FROM events
+          WHERE id = ?
+        `)
+        .run(eventId);
+
+      if (result.changes === 0) {
+        return res.status(404).json({
+          error:
+            "Событие не найдено."
+        });
+      }
+
+      res.status(204).send();
+    } catch (error) {
+      console.error(
+        "Ошибка удаления события:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Не удалось удалить событие."
+      });
+    }
+  }
+);
+
+/* =========================
+   ЗАГРУЗКА ФОТО НОВОСТИ
+========================= */
+
+app.post(
+  "/api/admin/uploads/news",
+  uploadNewsImage.single("image"),
+  (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({
+        error:
+          "Фотография не была выбрана."
+      });
+    }
+
+    /*
+      Возвращаем путь, который браузер
+      может открыть напрямую.
+    */
+    res.status(201).json({
+      image:
+        `/uploads/news/${req.file.filename}`
+    });
+  }
+);
+
+/* =========================
    ПУБЛИЧНЫЕ НОВОСТИ
 ========================= */
 
-/*
-  Получить опубликованные новости.
-
-  GET /api/news
-*/
 app.get("/api/news", (req, res) => {
   try {
     const rows = db
@@ -383,100 +593,17 @@ app.get("/api/news", (req, res) => {
   }
 });
 
-/*
-  Получить одну опубликованную новость.
-
-  GET /api/news/:id
-*/
-app.get("/api/news/:id", (req, res) => {
-  try {
-    const newsId = Number(req.params.id);
-
-    if (!Number.isInteger(newsId)) {
-      return res.status(400).json({
-        error: "Некорректный ID новости."
-      });
-    }
-
-    const row = db
-      .prepare(`
-        SELECT *
-        FROM news
-        WHERE id = ?
-          AND published = 1
-      `)
-      .get(newsId);
-
-    if (!row) {
-      return res.status(404).json({
-        error: "Новость не найдена."
-      });
-    }
-
-    res.json(normalizeNews(row));
-  } catch (error) {
-    console.error(
-      "Ошибка загрузки новости:",
-      error
-    );
-
-    res.status(500).json({
-      error:
-        "Не удалось загрузить новость."
-    });
-  }
-});
-
-/* =========================
-   НОВОСТИ ДЛЯ АДМИНКИ
-========================= */
-
-/*
-  Получить все новости,
-  включая скрытые.
-
-  GET /api/admin/news
-*/
-app.get("/api/admin/news", (req, res) => {
-  try {
-    const rows = db
-      .prepare(`
-        SELECT *
-        FROM news
-        ORDER BY publication_date DESC, id DESC
-      `)
-      .all();
-
-    res.json(
-      rows.map(normalizeNews)
-    );
-  } catch (error) {
-    console.error(
-      "Ошибка загрузки новостей:",
-      error
-    );
-
-    res.status(500).json({
-      error:
-        "Не удалось загрузить новости."
-    });
-  }
-});
-
-/*
-  Получить одну новость для редактирования.
-
-  GET /api/admin/news/:id
-*/
 app.get(
-  "/api/admin/news/:id",
+  "/api/news/:id",
   (req, res) => {
     try {
-      const newsId = Number(req.params.id);
+      const newsId =
+        Number(req.params.id);
 
       if (!Number.isInteger(newsId)) {
         return res.status(400).json({
-          error: "Некорректный ID новости."
+          error:
+            "Некорректный ID новости."
         });
       }
 
@@ -485,16 +612,20 @@ app.get(
           SELECT *
           FROM news
           WHERE id = ?
+            AND published = 1
         `)
         .get(newsId);
 
       if (!row) {
         return res.status(404).json({
-          error: "Новость не найдена."
+          error:
+            "Новость не найдена."
         });
       }
 
-      res.json(normalizeNews(row));
+      res.json(
+        normalizeNews(row)
+      );
     } catch (error) {
       console.error(
         "Ошибка загрузки новости:",
@@ -509,87 +640,164 @@ app.get(
   }
 );
 
-/*
-  Создать новость.
+/* =========================
+   НОВОСТИ В АДМИНКЕ
+========================= */
 
-  POST /api/admin/news
-*/
-app.post("/api/admin/news", (req, res) => {
-  try {
-    const validation =
-      validateNews(req.body);
+app.get(
+  "/api/admin/news",
+  (req, res) => {
+    try {
+      const rows = db
+        .prepare(`
+          SELECT *
+          FROM news
+          ORDER BY publication_date DESC, id DESC
+        `)
+        .all();
 
-    if (validation.error) {
-      return res.status(400).json({
-        error: validation.error
-      });
-    }
-
-    const newsItem = validation.value;
-
-    const result = db
-      .prepare(`
-        INSERT INTO news (
-          title,
-          category,
-          excerpt,
-          content,
-          image,
-          author,
-          publication_date,
-          published
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `)
-      .run(
-        newsItem.title,
-        newsItem.category,
-        newsItem.excerpt,
-        newsItem.content,
-        newsItem.image,
-        newsItem.author,
-        newsItem.date,
-        newsItem.published ? 1 : 0
+      res.json(
+        rows.map(normalizeNews)
+      );
+    } catch (error) {
+      console.error(
+        "Ошибка загрузки новостей:",
+        error
       );
 
-    const createdNews = db
-      .prepare(`
-        SELECT *
-        FROM news
-        WHERE id = ?
-      `)
-      .get(result.lastInsertRowid);
-
-    res
-      .status(201)
-      .json(normalizeNews(createdNews));
-  } catch (error) {
-    console.error(
-      "Ошибка создания новости:",
-      error
-    );
-
-    res.status(500).json({
-      error:
-        "Не удалось создать новость."
-    });
+      res.status(500).json({
+        error:
+          "Не удалось загрузить новости."
+      });
+    }
   }
-});
+);
 
-/*
-  Изменить новость.
+app.get(
+  "/api/admin/news/:id",
+  (req, res) => {
+    try {
+      const newsId =
+        Number(req.params.id);
 
-  PUT /api/admin/news/:id
-*/
+      if (!Number.isInteger(newsId)) {
+        return res.status(400).json({
+          error:
+            "Некорректный ID новости."
+        });
+      }
+
+      const row = db
+        .prepare(`
+          SELECT *
+          FROM news
+          WHERE id = ?
+        `)
+        .get(newsId);
+
+      if (!row) {
+        return res.status(404).json({
+          error:
+            "Новость не найдена."
+        });
+      }
+
+      res.json(
+        normalizeNews(row)
+      );
+    } catch (error) {
+      console.error(
+        "Ошибка загрузки новости:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Не удалось загрузить новость."
+      });
+    }
+  }
+);
+
+app.post(
+  "/api/admin/news",
+  (req, res) => {
+    try {
+      const validation =
+        validateNews(req.body);
+
+      if (validation.error) {
+        return res.status(400).json({
+          error: validation.error
+        });
+      }
+
+      const newsItem =
+        validation.value;
+
+      const result = db
+        .prepare(`
+          INSERT INTO news (
+            title,
+            category,
+            excerpt,
+            content,
+            image,
+            author,
+            publication_date,
+            published
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `)
+        .run(
+          newsItem.title,
+          newsItem.category,
+          newsItem.excerpt,
+          newsItem.content,
+          newsItem.image,
+          newsItem.author,
+          newsItem.date,
+          newsItem.published ? 1 : 0
+        );
+
+      const createdNews = db
+        .prepare(`
+          SELECT *
+          FROM news
+          WHERE id = ?
+        `)
+        .get(result.lastInsertRowid);
+
+      res
+        .status(201)
+        .json(
+          normalizeNews(createdNews)
+        );
+    } catch (error) {
+      console.error(
+        "Ошибка создания новости:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Не удалось создать новость."
+      });
+    }
+  }
+);
+
 app.put(
   "/api/admin/news/:id",
   (req, res) => {
     try {
-      const newsId = Number(req.params.id);
+      const newsId =
+        Number(req.params.id);
 
       if (!Number.isInteger(newsId)) {
         return res.status(400).json({
-          error: "Некорректный ID новости."
+          error:
+            "Некорректный ID новости."
         });
       }
 
@@ -603,7 +811,8 @@ app.put(
 
       if (!existingNews) {
         return res.status(404).json({
-          error: "Новость не найдена."
+          error:
+            "Новость не найдена."
         });
       }
 
@@ -616,7 +825,8 @@ app.put(
         });
       }
 
-      const newsItem = validation.value;
+      const newsItem =
+        validation.value;
 
       db.prepare(`
         UPDATE news
@@ -668,20 +878,17 @@ app.put(
   }
 );
 
-/*
-  Удалить новость.
-
-  DELETE /api/admin/news/:id
-*/
 app.delete(
   "/api/admin/news/:id",
   (req, res) => {
     try {
-      const newsId = Number(req.params.id);
+      const newsId =
+        Number(req.params.id);
 
       if (!Number.isInteger(newsId)) {
         return res.status(400).json({
-          error: "Некорректный ID новости."
+          error:
+            "Некорректный ID новости."
         });
       }
 
@@ -694,7 +901,8 @@ app.delete(
 
       if (result.changes === 0) {
         return res.status(404).json({
-          error: "Новость не найдена."
+          error:
+            "Новость не найдена."
         });
       }
 
@@ -713,23 +921,61 @@ app.delete(
   }
 );
 
-app.listen(PORT, () => {
-  console.log(`Сайт запущен: http://localhost:${PORT}`);
-  console.log(`Админка: http://localhost:${PORT}/admin/login.html`);
+/* =========================
+   ОБРАБОТКА ОШИБОК ЗАГРУЗКИ
+========================= */
+
+app.use((error, req, res, next) => {
+  if (
+    error instanceof
+    multer.MulterError
+  ) {
+    if (
+      error.code ===
+      "LIMIT_FILE_SIZE"
+    ) {
+      return res.status(400).json({
+        error:
+          "Фотография слишком большая. Максимум 5 МБ."
+      });
+    }
+
+    return res.status(400).json({
+      error:
+        "Ошибка загрузки фотографии."
+    });
+  }
+
+  if (
+    error?.message ===
+    "Разрешены только JPG, PNG и WEBP."
+  ) {
+    return res.status(400).json({
+      error: error.message
+    });
+  }
+
+  console.error(
+    "Необработанная ошибка:",
+    error
+  );
+
+  res.status(500).json({
+    error:
+      "Внутренняя ошибка сервера."
+  });
 });
 
-function normalizeNews(row) {
-  return {
-    id: row.id,
-    title: row.title,
-    category: row.category,
-    excerpt: row.excerpt,
-    content: row.content,
-    image: row.image,
-    author: row.author,
-    date: row.publication_date,
-    published: Boolean(row.published),
-    createdAt: row.created_at,
-    updatedAt: row.updated_at
-  };
-}
+/* =========================
+   ЗАПУСК СЕРВЕРА
+========================= */
+
+app.listen(PORT, () => {
+  console.log(
+    `Сайт запущен: http://localhost:${PORT}`
+  );
+
+  console.log(
+    `Админка: http://localhost:${PORT}/admin/login.html`
+  );
+});

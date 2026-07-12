@@ -259,19 +259,43 @@
               </div>
 
               <div class="admin-form-group">
-                <label for="newsImage">
+                <label>
                   Изображение
                 </label>
 
                 <input
-                  type="text"
+                  type="hidden"
                   id="newsImage"
-                  placeholder="Например: images/news/news-1.jpg"
                 >
 
-                <small>
-                  Пока укажи путь к фотографии в проекте.
-                </small>
+                <label
+                  class="admin-image-upload"
+                  id="newsImageUpload"
+                  for="newsImageFile"
+                >
+                  <input
+                    type="file"
+                    id="newsImageFile"
+                    accept="image/jpeg,image/png,image/webp"
+                  >
+
+                  <span class="admin-image-upload-icon">
+                    📷
+                  </span>
+
+                  <strong>
+                    Выбрать фотографию
+                  </strong>
+
+                  <small>
+                    JPG, PNG или WEBP · максимум 5 МБ
+                  </small>
+                </label>
+
+                <p
+                  class="admin-upload-status"
+                  id="newsUploadStatus"
+                ></p>
               </div>
 
               <div
@@ -284,6 +308,14 @@
                   src=""
                   alt="Предпросмотр изображения"
                 >
+
+                <button
+                  class="admin-remove-image"
+                  id="removeNewsImageButton"
+                  type="button"
+                >
+                  Удалить фотографию
+                </button>
               </div>
 
               <div class="admin-form-group">
@@ -441,6 +473,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
   <script src="js/news-admin.js"></script>
+  
 
 </body>
 </html>
