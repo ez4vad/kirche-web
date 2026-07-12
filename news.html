@@ -2,7 +2,11 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Новости | Philadelphia</title>
 
@@ -13,6 +17,7 @@
 <body>
 
 <header class="header">
+
   <a class="logo" href="index.html">
     <img
       src="images/logo.png"
@@ -22,7 +27,8 @@
 
   <a href="donate.html" class="header-donate-btn">
     ♥ Пожертвовать
-    </a>
+  </a>
+
   <button
     class="burger"
     id="burgerBtn"
@@ -30,7 +36,9 @@
     aria-label="Открыть меню"
     aria-expanded="false"
   >
-    ☰
+    <span></span>
+    <span></span>
+    <span></span>
   </button>
 
   <nav class="mobile-menu" id="mobileMenu">
@@ -38,120 +46,51 @@
     <a href="about.html">О нас</a>
     <a href="services.html">Служения</a>
     <a href="events.html">События</a>
-    <a href="news.html">Новости</a>
+    <a href="news.html" class="active-link">Новости</a>
     <a href="gallery.html">Галерея</a>
+    <a href="prayer-request.html">Молитвенный запрос</a>
     <a href="contacts.html">Контакты</a>
-    <a href="donate.html" class="active-link">Пожертвовать</a>
   </nav>
+
 </header>
 
 <main class="news-page">
 
   <section class="news-hero">
-    <p class="about-label">Жизнь церкви</p>
+    <p class="about-label">
+      Жизнь церкви
+    </p>
 
     <h1>Новости</h1>
 
     <p>
-      Здесь мы делимся важными событиями, встречами и новостями
-      церкви «Филадельфия».
+      Здесь мы делимся важными событиями,
+      встречами и новостями церкви
+      «Филадельфия».
     </p>
   </section>
 
   <section class="news-section">
 
-    <div class="news-list">
+    <div
+      class="news-list"
+      id="newsList"
+    >
+      <div class="news-loading">
+        Загрузка новостей...
+      </div>
+    </div>
 
-      <article class="news-card">
-        <a href="news-detail.html?id=1" class="news-image-link">
-          <img
-            src="images/news-1.jpg"
-            alt="Воскресное служение в церкви"
-          >
+    <div
+      class="news-empty"
+      id="newsEmpty"
+      hidden
+    >
+      <h2>Новостей пока нет</h2>
 
-          <span class="news-category">Богослужение</span>
-        </a>
-
-        <div class="news-content">
-          <time datetime="2026-07-12">12 июля 2026</time>
-
-          <h2>
-            <a href="news-detail.html?id=1">
-              Воскресное служение в церкви «Филадельфия»
-            </a>
-          </h2>
-
-          <p>
-            Приглашаем провести воскресный день вместе в молитве,
-            прославлении и общении.
-          </p>
-
-          <a href="news-detail.html?id=1" class="news-read-more">
-            Читать подробнее →
-          </a>
-        </div>
-      </article>
-
-      <article class="news-card">
-        <a href="news-detail.html?id=2" class="news-image-link">
-          <img
-            src="images/news-2.jpg"
-            alt="Молодёжная встреча"
-          >
-
-          <span class="news-category">Молодёжь</span>
-        </a>
-
-        <div class="news-content">
-          <time datetime="2026-07-05">5 июля 2026</time>
-
-          <h2>
-            <a href="news-youth.html">
-              Молодёжная встреча: вера, дружба и честные вопросы
-            </a>
-          </h2>
-
-          <p>
-            Вечер для молодых людей, где можно общаться, задавать вопросы
-            и вместе узнавать Бога.
-          </p>
-
-          <a href="news-detail.html?id=2" class="news-read-more">
-            Читать подробнее →
-          </a>
-        </div>
-      </article>
-
-      <article class="news-card">
-        <a href="news-detail.html?id=3" class="news-image-link">
-          <img
-            src="images/news-3.jpg"
-            alt="Общение после служения"
-          >
-
-          <span class="news-category">Община</span>
-        </a>
-
-        <div class="news-content">
-          <time datetime="2026-06-28">28 июня 2026</time>
-
-          <h2>
-            <a href="news-community.html">
-              Время общения и тёплый обед после служения
-            </a>
-          </h2>
-
-          <p>
-            После богослужения мы остаёмся вместе, знакомимся,
-            поддерживаем друг друга и разделяем трапезу.
-          </p>
-
-          <a href="news-detail.html?id=3" class="news-read-more">
-            Читать подробнее →
-          </a>
-        </div>
-      </article>
-
+      <p>
+        Скоро здесь появятся новые публикации.
+      </p>
     </div>
 
   </section>
@@ -177,32 +116,6 @@
       <p class="footer-description">
         Церковь, где тебя видят, слышат и принимают.
       </p>
-
-      <div class="footer-socials">
-        <a href="#" class="social-link" aria-label="YouTube">
-          <svg viewBox="0 0 24 24">
-            <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.7V8.3L16 12l-6.4 3.7Z"/>
-          </svg>
-        </a>
-
-        <a href="#" class="social-link" aria-label="Instagram">
-          <svg viewBox="0 0 24 24">
-            <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm11.5 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/>
-          </svg>
-        </a>
-
-        <a href="#" class="social-link" aria-label="Telegram">
-          <svg viewBox="0 0 24 24">
-            <path d="M21.9 3.2 18.7 20c-.2 1.2-.9 1.5-1.8.9l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9-8.1c.4-.4-.1-.6-.6-.2L6.2 13.9 1.4 12.4c-1-.3-1-1 .2-1.5L20.4 3.7c.9-.3 1.7.2 1.5-.5Z"/>
-          </svg>
-        </a>
-
-        <a href="#" class="social-link" aria-label="Facebook">
-          <svg viewBox="0 0 24 24">
-            <path d="M13.5 22v-8h2.7l.4-3h-3.1V9.1c0-.9.3-1.6 1.6-1.6H17V4.8c-.3 0-1.4-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3V11H7.5v3h2.8v8h3.2Z"/>
-          </svg>
-        </a>
-      </div>
     </div>
 
     <div class="footer-nav">
@@ -220,71 +133,17 @@
       </div>
     </div>
 
-    <div class="footer-contacts">
-      <h3>Контакты</h3>
-
-      <a
-        class="footer-contact-card"
-        href="https://www.google.com/maps/dir/?api=1&destination=Horner+Heerstraße+28,+28359+Bremen"
-        target="_blank"
-        rel="noopener"
-      >
-        <span class="footer-contact-icon">⌖</span>
-
-        <span>
-          <strong>Адрес</strong>
-          <small>
-            Horner Heerstraße 28<br>
-            28359 Bremen
-          </small>
-        </span>
-      </a>
-
-      <div class="footer-contact-card">
-        <span class="footer-contact-icon">◷</span>
-
-        <span>
-          <strong>Время служения</strong>
-          <small>
-            Каждое воскресенье<br>
-            в 15:00
-          </small>
-        </span>
-      </div>
-
-      <a
-        class="footer-contact-card"
-        href="mailto:info@example.de"
-      >
-        <span class="footer-contact-icon">✉</span>
-
-        <span>
-          <strong>Email</strong>
-          <small>info@example.de</small>
-        </span>
-      </a>
-
-      <a
-        class="footer-contact-card"
-        href="tel:+490000000000"
-      >
-        <span class="footer-contact-icon">☎</span>
-
-        <span>
-          <strong>Телефон</strong>
-          <small>+49 000 000000</small>
-        </span>
-      </a>
-    </div>
-
   </div>
 
   <div class="footer-bottom">
-    <p>© 2026 Philadelphia Christengemeinde Bremen</p>
-    <p>Сделано с <span>♥</span></p>
+    <p>
+      © 2026 Philadelphia Christengemeinde Bremen
+    </p>
   </div>
 </footer>
 
+<script src="js/app.js"></script>
+<script src="js/news.js"></script>
 <script src="js/script.js"></script>
 
 </body>

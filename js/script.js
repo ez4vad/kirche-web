@@ -357,3 +357,93 @@ function renderHomepageEvents() {
 }
 
 loadHomepageEvents();
+
+/* ===========================
+   ПОСЛЕДНИЕ НОВОСТИ
+=========================== */
+
+const homepageNews =
+    document.getElementById("homepageNews");
+
+async function loadHomepageNews(){
+
+    if(!homepageNews) return;
+
+    try{
+
+        const response =
+            await fetch("/api/news");
+
+        if(!response.ok){
+
+            throw new Error();
+
+        }
+
+        const news =
+            await response.json();
+
+        homepageNews.innerHTML =
+            news
+                .slice(0,3)
+                .map(item=>{
+
+                    return`
+
+<div class="news-card">
+
+<img
+src="${
+item.image
+? item.image
+: "images/news-placeholder.jpg"
+}"
+alt="">
+
+<div class="news-content">
+
+<span>
+
+${item.category||"Новости"}
+
+</span>
+
+<h3>
+
+${item.title}
+
+</h3>
+
+<p>
+
+${item.excerpt}
+
+</p>
+
+<a href="news-detail.html?id=${item.id}">
+
+Подробнее →
+
+</a>
+
+</div>
+
+</div>
+
+`;
+
+                })
+
+                .join("");
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+loadHomepageNews();

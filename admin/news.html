@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Управление новостями | Philadelphia</title>
+
+  <link rel="stylesheet" href="css/admin.css">
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css"
+    rel="stylesheet"
+  >
+</head>
+
+<body class="admin-dashboard-page">
+
+  <div class="admin-layout">
+
+    <aside class="admin-sidebar" id="adminSidebar">
+
+      <div class="admin-sidebar-top">
+        <a href="../index.html" class="admin-sidebar-logo">
+          <img
+            src="../images/logo.png"
+            alt="Philadelphia"
+          >
+        </a>
+
+        <button
+          class="admin-sidebar-close"
+          id="adminSidebarClose"
+          type="button"
+          aria-label="Закрыть меню"
+        >
+          ×
+        </button>
+      </div>
+
+      <nav class="admin-navigation">
+
+        <a href="dashboard.html" class="admin-nav-link">
+          <span>⌂</span>
+          Главная
+        </a>
+
+        <a href="events.html" class="admin-nav-link">
+          <span>◫</span>
+          События
+        </a>
+
+        <a href="news.html" class="admin-nav-link active">
+          <span>▤</span>
+          Новости
+        </a>
+
+        <a href="gallery.html" class="admin-nav-link">
+          <span>▦</span>
+          Галерея
+        </a>
+
+        <a href="prayer.html" class="admin-nav-link">
+          <span>♡</span>
+          Молитвенные запросы
+        </a>
+
+        <a href="settings.html" class="admin-nav-link">
+          <span>⚙</span>
+          Настройки
+        </a>
+
+      </nav>
+
+      <div class="admin-sidebar-bottom">
+
+        <a href="../index.html" class="admin-site-link">
+          Открыть сайт
+        </a>
+
+        <button
+          class="admin-logout-button"
+          id="adminLogoutButton"
+          type="button"
+        >
+          Выйти
+        </button>
+
+      </div>
+
+    </aside>
+
+    <div
+      class="admin-sidebar-overlay"
+      id="adminSidebarOverlay"
+    ></div>
+
+    <main class="admin-main">
+
+      <header class="admin-topbar">
+
+        <button
+          class="admin-menu-button"
+          id="adminMenuButton"
+          type="button"
+          aria-label="Открыть меню"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="admin-topbar-title">
+          <span>Панель управления</span>
+          <strong>Новости</strong>
+        </div>
+
+        <div class="admin-profile">
+          <div class="admin-avatar">A</div>
+        </div>
+
+      </header>
+
+      <section class="admin-dashboard-content">
+
+        <div class="admin-page-heading">
+
+          <div>
+            <span class="admin-section-label">
+              Жизнь церкви
+            </span>
+
+            <h1>Управление новостями</h1>
+
+            <p>
+              Добавляйте, редактируйте, публикуйте
+              и удаляйте новости.
+            </p>
+          </div>
+
+          <button
+            class="admin-primary-button"
+            id="openNewsFormButton"
+            type="button"
+          >
+            + Добавить новость
+          </button>
+
+        </div>
+
+        <section
+          class="admin-news-form-section"
+          id="newsFormSection"
+          hidden
+        >
+
+          <div class="admin-form-card">
+
+            <div class="admin-form-card-heading">
+
+              <div>
+                <span id="newsFormLabel">
+                  Новая публикация
+                </span>
+
+                <h2 id="newsFormTitle">
+                  Добавить новость
+                </h2>
+              </div>
+
+              <button
+                class="admin-form-close"
+                id="closeNewsFormButton"
+                type="button"
+                aria-label="Закрыть форму"
+              >
+                ×
+              </button>
+
+            </div>
+
+            <form id="newsForm" novalidate>
+
+              <input
+                type="hidden"
+                id="newsId"
+              >
+
+              <div class="admin-form-group">
+                <label for="newsTitle">
+                  Заголовок *
+                </label>
+
+                <input
+                  type="text"
+                  id="newsTitle"
+                  placeholder="Название новости"
+                  maxlength="180"
+                  required
+                >
+              </div>
+
+              <div class="admin-form-row">
+
+                <div class="admin-form-group">
+                  <label for="newsCategory">
+                    Категория
+                  </label>
+
+                  <select id="newsCategory">
+                    <option value="">Без категории</option>
+                    <option value="Богослужение">
+                      Богослужение
+                    </option>
+                    <option value="Молодёжь">
+                      Молодёжь
+                    </option>
+                    <option value="Дети">
+                      Дети
+                    </option>
+                    <option value="Община">
+                      Община
+                    </option>
+                    <option value="Мероприятие">
+                      Мероприятие
+                    </option>
+                  </select>
+                </div>
+
+                <div class="admin-form-group">
+                  <label for="newsDate">
+                    Дата публикации *
+                  </label>
+
+                  <input
+                    type="date"
+                    id="newsDate"
+                    required
+                  >
+                </div>
+
+              </div>
+
+              <div class="admin-form-group">
+                <label for="newsAuthor">
+                  Автор
+                </label>
+
+                <input
+                  type="text"
+                  id="newsAuthor"
+                  placeholder="Например: Philadelphia Bremen"
+                  maxlength="120"
+                >
+              </div>
+
+              <div class="admin-form-group">
+                <label for="newsImage">
+                  Изображение
+                </label>
+
+                <input
+                  type="text"
+                  id="newsImage"
+                  placeholder="Например: images/news/news-1.jpg"
+                >
+
+                <small>
+                  Пока укажи путь к фотографии в проекте.
+                </small>
+              </div>
+
+              <div
+                class="admin-news-preview"
+                id="newsImagePreview"
+                hidden
+              >
+                <img
+                  id="newsPreviewImage"
+                  src=""
+                  alt="Предпросмотр изображения"
+                >
+              </div>
+
+              <div class="admin-form-group">
+                <label for="newsExcerpt">
+                  Краткое описание *
+                </label>
+
+                <textarea
+                  id="newsExcerpt"
+                  rows="4"
+                  placeholder="Короткий текст для карточки новости"
+                  maxlength="500"
+                  required
+                ></textarea>
+
+                <small id="newsExcerptCounter">
+                  0 / 500
+                </small>
+              </div>
+
+              <div class="admin-form-group">
+                <label>
+                  Полный текст новости *
+                </label>
+
+                <div id="newsEditor"></div>
+              </div>
+
+              <label class="admin-checkbox-row">
+                <input
+                  type="checkbox"
+                  id="newsPublished"
+                  checked
+                >
+
+                <span></span>
+
+                <strong>
+                  Опубликовать новость на сайте
+                </strong>
+              </label>
+
+              <p
+                class="admin-form-error"
+                id="newsFormError"
+              ></p>
+
+              <div class="admin-form-actions">
+
+                <button
+                  class="admin-secondary-button"
+                  id="cancelNewsButton"
+                  type="button"
+                >
+                  Отмена
+                </button>
+
+                <button
+                  class="admin-primary-button"
+                  type="submit"
+                >
+                  Сохранить новость
+                </button>
+
+              </div>
+
+            </form>
+
+          </div>
+
+        </section>
+
+        <section class="admin-news-section">
+
+          <div class="admin-section-heading">
+
+            <div>
+              <span>Публикации</span>
+              <h2>Все новости</h2>
+            </div>
+
+            <strong
+              class="admin-items-count"
+              id="newsCount"
+            >
+              0
+            </strong>
+
+          </div>
+
+          <div
+            class="admin-news-list"
+            id="adminNewsList"
+          ></div>
+
+          <div
+            class="admin-empty-state"
+            id="newsEmptyState"
+            hidden
+          >
+            <div>▤</div>
+
+            <h3>Новостей пока нет</h3>
+
+            <p>
+              Добавьте первую публикацию.
+            </p>
+          </div>
+
+        </section>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <div
+    class="admin-confirm-modal"
+    id="deleteNewsModal"
+    aria-hidden="true"
+  >
+    <div class="admin-confirm-card">
+
+      <div class="admin-confirm-icon">!</div>
+
+      <h2>Удалить новость?</h2>
+
+      <p>
+        Восстановить её после удаления не получится.
+      </p>
+
+      <div class="admin-confirm-actions">
+
+        <button
+          class="admin-secondary-button"
+          id="cancelDeleteNewsButton"
+          type="button"
+        >
+          Отмена
+        </button>
+
+        <button
+          class="admin-danger-button"
+          id="confirmDeleteNewsButton"
+          type="button"
+        >
+          Удалить
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+  <script src="js/news-admin.js"></script>
+
+</body>
+</html>
