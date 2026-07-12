@@ -146,3 +146,214 @@ window.addEventListener("scroll", () => {
     }
 
 });
+
+/* ===========================
+   ГЛАВНАЯ - БЛИЖАЙШИЕ СОБЫТИЯ
+=========================== */
+
+const eventsCalendar =
+    document.getElementById("eventsCalendar");
+
+const eventsList =
+    document.getElementById("eventsList");
+
+let homepageEvents = [];
+
+let selectedHomepageDate = null;
+
+const monthNames = [
+    "Январь",
+    "Февраль",
+    "Март",
+    "Апрель",
+    "Май",
+    "Июнь",
+    "Июль",
+    "Август",
+    "Сентябрь",
+    "Октябрь",
+    "Ноябрь",
+    "Декабрь"
+];
+
+async function loadHomepageEvents() {
+
+    try {
+
+        const response = await fetch("/api/events");
+
+        if (!response.ok)
+            throw new Error();
+
+        homepageEvents = await response.json();
+
+        homepageEvents.sort((a,b)=>{
+
+            return `${a.date}T${a.time}`
+
+                .localeCompare(
+
+                    `${b.date}T${b.time}`
+
+                );
+
+        });
+
+        renderHomepageDays();
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+function renderHomepageDays() {
+  if (!eventsCalendar || !eventsList) return;
+
+  eventsCalendar.innerHTML = "";
+
+  if (homepageEvents.length === 0) {
+    eventsList.innerHTML = `
+      <div class="empty-events">
+        Пока нет ближайших событий
+      </div>
+    `;
+    return;
+  }
+
+  const uniqueDates = [
+    ...new Set(
+      homepageEvents.map((event) => event.date)
+    )
+  ].sort();
+
+  /*
+    Выбираем первую дату только при первой загрузке.
+    При клике выбранная дата больше не сбрасывается.
+  */
+  if (
+    !selectedHomepageDate ||
+    !uniqueDates.includes(selectedHomepageDate)
+  ) {
+    selectedHomepageDate = uniqueDates[0];
+  }
+
+  uniqueDates.forEach((date) => {
+    const [year, month, day] =
+      date.split("-").map(Number);
+
+    const eventDate = new Date(
+      year,
+      month - 1,
+      day
+    );
+
+    const button =
+      document.createElement("button");
+
+    button.type = "button";
+    button.className = "day";
+    button.dataset.day = date;
+
+    if (date === selectedHomepageDate) {
+      button.classList.add("active");
+    }
+
+    button.innerHTML = `
+      <span>${day}</span>
+
+      <small>
+        ${monthNames[month - 1]}
+      </small>
+    `;
+
+    button.addEventListener("click", () => {
+      selectedHomepageDate = date;
+
+      document
+        .querySelectorAll("#eventsCalendar .day")
+        .forEach((dayButton) => {
+          dayButton.classList.remove("active");
+        });
+
+      button.classList.add("active");
+
+      renderHomepageEvents();
+    });
+
+    eventsCalendar.appendChild(button);
+  });
+
+  renderHomepageEvents();
+}
+
+function renderHomepageEvents() {
+  if (!eventsList) return;
+
+  const selectedEvents = homepageEvents.filter(
+    (event) =>
+      event.date === selectedHomepageDate
+  );
+
+  if (selectedEvents.length === 0) {
+    eventsList.innerHTML = `
+      <div class="empty-events">
+        На этот день событий нет
+      </div>
+    `;
+    return;
+  }
+  function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+  eventsList.innerHTML = selectedEvents
+    .sort((a, b) =>
+      String(a.time).localeCompare(
+        String(b.time)
+      )
+    )
+    .map((event) => {
+      return `
+        <div class="event-item">
+          <div class="event-time">
+            ${escapeHtml(event.time)}
+          </div>
+
+          <div>
+            <h3>
+              ${escapeHtml(event.title)}
+            </h3>
+
+            <p>
+              ${escapeHtml(event.place)}
+            </p>
+
+            ${
+              event.description
+                ? `
+                  <p class="event-description">
+                    ${escapeHtml(
+                      event.description
+                    )}
+                  </p>
+                `
+                : ""
+            }
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+loadHomepageEvents();

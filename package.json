@@ -1,0 +1,26 @@
+{
+  "name": "kirche-web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+  "start": "node server/server.js",
+  "dev": "node --watch server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ez4vad/kirche-web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ez4vad/kirche-web/issues"
+  },
+  "homepage": "https://github.com/ez4vad/kirche-web#readme",
+  "dependencies": {
+    "better-sqlite3": "^12.11.1",
+    "express": "^5.2.1"
+  }
+}
