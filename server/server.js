@@ -1563,6 +1563,236 @@ app.delete(
     }
   }
 );
+
+/* =========================
+   АНАЛИТИКА — ЗАПИСЬ ПРОСМОТРА
+========================= */
+
+app.post("/api/analytics/track", (req, res) => {
+  try {
+    const sessionId = String(
+      req.body.sessionId || ""
+    ).trim();
+
+    const pagePath = String(
+      req.body.pagePath || ""
+    ).trim();
+
+    const pageTitle = String(
+      req.body.pageTitle || ""
+    )
+      .trim()
+      .slice(0, 250);
+
+    const referrer = String(
+      req.body.referrer || ""
+    )
+      .trim()
+      .slice(0, 500);
+
+    const allowedDevices = new Set([
+      "mobile",
+      "tablet",
+      "desktop"
+    ]);
+
+    const requestedDevice = String(
+      req.body.deviceType || "desktop"
+    );
+
+    const deviceType =
+      allowedDevices.has(requestedDevice)
+        ? requestedDevice
+        : "desktop";
+
+    if (
+      !sessionId ||
+      sessionId.length > 120 ||
+      !pagePath ||
+      pagePath.length > 500
+    ) {
+      return res.status(400).json({
+        error:
+          "Некорректные данные аналитики."
+      });
+    }
+
+    /*
+      Не учитываем страницы админки.
+    */
+    if (pagePath.startsWith("/admin/")) {
+      return res.status(204).send();
+    }
+
+    db.prepare(`
+      INSERT INTO analytics_pageviews (
+        session_id,
+        page_path,
+        page_title,
+        referrer,
+        device_type
+      )
+      VALUES (?, ?, ?, ?, ?)
+    `).run(
+      sessionId,
+      pagePath,
+      pageTitle,
+      referrer,
+      deviceType
+    );
+
+    res.status(204).send();
+  } catch (error) {
+    console.error(
+      "Ошибка записи аналитики:",
+      error
+    );
+
+    res.status(500).json({
+      error:
+        "Не удалось сохранить аналитику."
+    });
+  }
+});
+
+/* =========================
+   АНАЛИТИКА ДЛЯ АДМИНКИ
+========================= */
+
+app.get(
+  "/api/admin/analytics/summary",
+  (req, res) => {
+    try {
+      const todaySummary = db
+        .prepare(`
+          SELECT
+            COUNT(*) AS pageviews,
+            COUNT(DISTINCT session_id) AS visitors
+          FROM analytics_pageviews
+          WHERE DATE(created_at, 'localtime') =
+                DATE('now', 'localtime')
+        `)
+        .get();
+
+      const onlineSummary = db
+        .prepare(`
+          SELECT
+            COUNT(DISTINCT session_id) AS online
+          FROM analytics_pageviews
+          WHERE datetime(created_at) >=
+                datetime('now', '-5 minutes')
+        `)
+        .get();
+
+      const totalSummary = db
+        .prepare(`
+          SELECT
+            COUNT(*) AS pageviews,
+            COUNT(DISTINCT session_id) AS visitors
+          FROM analytics_pageviews
+        `)
+        .get();
+
+      const devices = db
+        .prepare(`
+          SELECT
+            device_type AS device,
+            COUNT(*) AS views
+          FROM analytics_pageviews
+          WHERE datetime(created_at) >=
+                datetime('now', '-30 days')
+          GROUP BY device_type
+          ORDER BY views DESC
+        `)
+        .all();
+
+      const topPages = db
+        .prepare(`
+          SELECT
+            page_path AS path,
+            MAX(page_title) AS title,
+            COUNT(*) AS views,
+            COUNT(DISTINCT session_id) AS visitors
+          FROM analytics_pageviews
+          WHERE datetime(created_at) >=
+                datetime('now', '-30 days')
+          GROUP BY page_path
+          ORDER BY views DESC
+          LIMIT 10
+        `)
+        .all();
+
+      const visitsByDay = db
+        .prepare(`
+          SELECT
+            DATE(created_at, 'localtime') AS date,
+            COUNT(*) AS pageviews,
+            COUNT(DISTINCT session_id) AS visitors
+          FROM analytics_pageviews
+          WHERE datetime(created_at) >=
+                datetime('now', '-29 days')
+          GROUP BY DATE(created_at, 'localtime')
+          ORDER BY date ASC
+        `)
+        .all();
+
+      res.json({
+        today: {
+          visitors:
+            Number(todaySummary.visitors) || 0,
+
+          pageviews:
+            Number(todaySummary.pageviews) || 0,
+
+          online:
+            Number(onlineSummary.online) || 0
+        },
+
+        total: {
+          visitors:
+            Number(totalSummary.visitors) || 0,
+
+          pageviews:
+            Number(totalSummary.pageviews) || 0
+        },
+
+        devices: devices.map((item) => ({
+          device: item.device,
+          views: Number(item.views) || 0
+        })),
+
+        topPages: topPages.map((item) => ({
+          path: item.path,
+          title: item.title,
+          views: Number(item.views) || 0,
+          visitors:
+            Number(item.visitors) || 0
+        })),
+
+        visitsByDay: visitsByDay.map(
+          (item) => ({
+            date: item.date,
+            pageviews:
+              Number(item.pageviews) || 0,
+
+            visitors:
+              Number(item.visitors) || 0
+          })
+        )
+      });
+    } catch (error) {
+      console.error(
+        "Ошибка загрузки аналитики:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Не удалось загрузить аналитику."
+      });
+    }
+  }
+);
 /* =========================
    ОБРАБОТКА ОШИБОК ЗАГРУЗКИ
 ========================= */

@@ -4,6 +4,35 @@ const temporaryAdminAccess =
 if (temporaryAdminAccess !== "true") {
   window.location.href = "login.html";
 }
+const todayVisitors =
+document.getElementById(
+"todayVisitors"
+);
+
+const todayViews =
+document.getElementById(
+"todayViews"
+);
+
+const todayOnline =
+document.getElementById(
+"todayOnline"
+);
+
+const totalViews =
+document.getElementById(
+"totalViews"
+);
+
+const topPagesList =
+document.getElementById(
+"topPagesList"
+);
+
+const analyticsChart =
+document.getElementById(
+"analyticsChart"
+);
 
 /* =========================
    SIDEBAR
@@ -111,7 +140,130 @@ const dashboardLatestPrayers =
   document.getElementById(
     "dashboardLatestPrayers"
   );
+async function loadAnalytics(){
 
+const analytics=
+await fetchJson(
+"/api/admin/analytics/summary"
+);
+
+todayVisitors.textContent=
+analytics.today.visitors;
+
+todayViews.textContent=
+analytics.today.pageviews;
+
+todayOnline.textContent=
+analytics.today.online;
+
+totalViews.textContent=
+analytics.total.pageviews;
+
+topPagesList.innerHTML=
+analytics.topPages
+.map(page=>{
+
+return`
+
+<div class="top-page">
+
+<div>
+
+<strong>
+
+${page.title || page.path}
+
+</strong>
+
+<small>
+
+${page.path}
+
+</small>
+
+</div>
+
+<span>
+
+${page.views}
+
+</span>
+
+</div>
+
+`;
+
+}).join("");
+
+drawAnalyticsChart(
+analytics.visitsByDay
+);
+
+}
+
+function drawAnalyticsChart(data){
+
+if(!analyticsChart)return;
+
+const ctx=
+analyticsChart.getContext("2d");
+
+const width=
+analyticsChart.width;
+
+const height=
+analyticsChart.height;
+
+ctx.clearRect(
+0,
+0,
+width,
+height
+);
+
+if(data.length===0){
+return;
+}
+
+const max=Math.max(
+...data.map(
+d=>d.pageviews
+),
+1
+);
+
+ctx.beginPath();
+
+ctx.lineWidth=3;
+
+ctx.strokeStyle="#32AEE2";
+
+data.forEach((day,index)=>{
+
+const x=
+index*
+(width/(data.length-1));
+
+const y=
+height-
+(day.pageviews/max)
+*(height-20);
+
+if(index===0){
+
+ctx.moveTo(x,y);
+
+}else{
+
+ctx.lineTo(x,y);
+
+}
+
+});
+
+ctx.stroke();
+
+}
 /* =========================
    ПОМОЩНИКИ
 ========================= */
@@ -562,4 +714,10 @@ async function loadDashboardData() {
   }
 }
 
-loadDashboardData();
+Promise.all([
+
+loadDashboardData(),
+
+loadAnalytics()
+
+]);

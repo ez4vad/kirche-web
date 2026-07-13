@@ -81,4 +81,32 @@ db.exec(`
   )
 `);
 
+/* =========================
+   АНАЛИТИКА
+========================= */
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS analytics_pageviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id TEXT NOT NULL,
+    page_path TEXT NOT NULL,
+    page_title TEXT DEFAULT '',
+    referrer TEXT DEFAULT '',
+    device_type TEXT DEFAULT 'desktop',
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+
+db.exec(`
+  CREATE INDEX IF NOT EXISTS
+  analytics_pageviews_created_at_index
+  ON analytics_pageviews(created_at)
+`);
+
+db.exec(`
+  CREATE INDEX IF NOT EXISTS
+  analytics_pageviews_session_id_index
+  ON analytics_pageviews(session_id)
+`);
+
 module.exports = db;
