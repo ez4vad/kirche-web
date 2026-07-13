@@ -100,3 +100,302 @@
   display: block;
   box-shadow: 0 12px 30px rgba(0,0,0,.08);
 }
+
+/* ==================================================
+   DESKTOP
+================================================== */
+
+@media (min-width:1024px){
+
+.about-page{
+    padding-top:120px;
+}
+
+/* ---------- HERO ---------- */
+
+.about-intro{
+
+    max-width:1240px;
+
+    margin:40px auto 80px;
+
+    padding:90px;
+
+    border-radius:34px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    min-height:520px;
+
+    background:
+
+    linear-gradient(
+        135deg,
+        rgba(50,174,226,.08),
+        rgba(255,255,255,.98)
+    );
+
+}
+
+.about-label{
+
+    font-size:15px;
+
+    letter-spacing:4px;
+
+}
+
+.about-intro h1{
+
+    max-width:760px;
+
+    font-size:74px;
+
+    line-height:.95;
+
+    margin-bottom:35px;
+
+}
+
+.about-intro p{
+
+    max-width:700px;
+
+    font-size:20px;
+
+}
+
+.about-btn{
+
+    width:max-content;
+
+    margin-top:25px;
+
+    padding:18px 34px;
+
+    transition:.25s;
+
+}
+
+.about-btn:hover{
+
+    transform:translateY(-3px);
+
+}
+
+/* ---------- SECTION ---------- */
+
+.about-section{
+
+    padding:90px 40px;
+
+}
+
+.about-section h2{
+
+    max-width:1240px;
+
+    margin:0 auto 35px;
+
+    font-size:48px;
+
+}
+
+/* ---------- CARD ---------- */
+
+.text-card{
+
+    max-width:1240px;
+
+    margin:auto;
+
+    padding:55px;
+
+    border-radius:28px;
+
+}
+
+.text-card h3{
+
+    font-size:34px;
+
+}
+
+.text-card p{
+
+    font-size:18px;
+
+    line-height:1.9;
+
+}
+
+/* ---------- HISTORY ---------- */
+
+.about-section:first-of-type .text-card{
+
+    column-count:2;
+
+    column-gap:70px;
+
+}
+
+.about-section:first-of-type h3{
+
+    column-span:all;
+
+    margin-bottom:35px;
+
+}
+
+/* ---------- YOUTH ---------- */
+
+.blue-section .text-card{
+
+    background:white;
+
+}
+
+/* ---------- PASTORS ---------- */
+
+.pastors-section{
+
+    padding:90px 40px;
+
+}
+
+.pastors-section{
+
+    display:grid;
+
+    grid-template-columns:
+
+        560px
+
+        1fr;
+
+    gap:50px;
+
+    align-items:center;
+
+    max-width:1240px;
+
+    margin:auto;
+
+}
+
+.pastors-section h2{
+
+    grid-column:1/-1;
+
+    margin-bottom:0;
+
+}
+
+.pastors-photo{
+
+    margin:0;
+
+    height:680px;
+
+    object-fit:cover;
+
+    border-radius:30px;
+
+}
+
+.pastors-section .text-card{
+
+    height:100%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+}
+
+.about-btn-2{
+
+    width:max-content;
+
+    justify-content:center;
+
+}
+
+/* ---------- ANIMATION ---------- */
+
+.text-card{
+
+    transition:
+
+    transform .25s,
+
+    box-shadow .25s;
+
+}
+
+.text-card:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:
+
+    0 20px 55px rgba(0,0,0,.09);
+
+}
+
+.pastors-photo{
+
+    transition:.4s;
+
+}
+
+.pastors-photo:hover{
+
+    transform:scale(1.02);
+
+}
+
+}
+
+
+/* ==========================================
+   NOTEBOOK
+========================================== */
+
+@media (min-width:1024px) and (max-width:1200px){
+
+.about-intro{
+
+    padding:70px;
+
+}
+
+.about-intro h1{
+
+    font-size:58px;
+
+}
+
+.pastors-section{
+
+    grid-template-columns:
+
+        420px
+
+        1fr;
+
+}
+
+.pastors-photo{
+
+    height:560px;
+
+}
+
+}

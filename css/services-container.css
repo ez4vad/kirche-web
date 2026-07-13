@@ -90,3 +90,210 @@
   border-radius: 18px;
   font-weight: 800;
 }
+
+/* ==================================================
+   SERVICE DETAIL — DESKTOP
+================================================== */
+
+@media (min-width: 1024px) {
+
+  .service-detail {
+    padding-top: 120px;
+    background: var(--background);
+  }
+
+  /* =========================
+     HERO
+  ========================= */
+
+  .service-detail-hero {
+    position: relative;
+
+    max-width: 1320px;
+    height: 720px;
+
+    margin: 30px auto 0;
+
+    overflow: hidden;
+    border-radius: 34px;
+  }
+
+  .service-detail-hero img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+    object-fit: cover;
+
+    transition: transform 0.8s ease;
+  }
+
+  .service-detail-hero:hover img {
+    transform: scale(1.025);
+  }
+
+  .service-detail-hero::after {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.76) 0%,
+        rgba(0, 0, 0, 0.45) 48%,
+        rgba(0, 0, 0, 0.08) 100%
+      ),
+      linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.42),
+        transparent 55%
+      );
+  }
+
+  .service-detail-text {
+    left: 70px;
+    right: auto;
+    bottom: 80px;
+
+    width: 700px;
+    max-width: calc(100% - 140px);
+  }
+
+  .service-detail-text span {
+    margin-bottom: 18px;
+    padding: 9px 15px;
+
+    color: var(--white);
+    background: var(--primary);
+
+    border-radius: 999px;
+
+    font-size: 13px;
+    letter-spacing: 2.5px;
+  }
+
+  .service-detail-text h1 {
+    margin-bottom: 22px;
+
+    font-size: clamp(58px, 6vw, 86px);
+    line-height: 0.96;
+    letter-spacing: -3px;
+  }
+
+  .service-detail-text p {
+    max-width: 650px;
+
+    font-size: 20px;
+    line-height: 1.65;
+  }
+
+  /* =========================
+     CONTENT
+  ========================= */
+
+  .service-detail-content {
+    max-width: 980px;
+
+    margin: -70px auto 0;
+    padding: 70px 80px 80px;
+
+    border-radius: 32px;
+
+    box-shadow:
+      0 24px 65px rgba(25, 45, 55, 0.11);
+  }
+
+  .service-detail-content h2 {
+    margin-bottom: 28px;
+
+    font-size: 46px;
+    line-height: 1.05;
+  }
+
+  .service-detail-content p {
+    margin-bottom: 22px;
+
+    font-size: 18px;
+    line-height: 1.9;
+  }
+
+  .service-detail-btn {
+    width: max-content;
+    min-width: 210px;
+
+    margin-top: 32px;
+    padding: 17px 30px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    font-size: 16px;
+
+    transition:
+      transform 0.25s ease,
+      background 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .service-detail-btn:hover {
+    transform: translateY(-3px);
+    background: var(--primary-dark);
+
+    box-shadow:
+      0 14px 30px rgba(50, 174, 226, 0.26);
+  }
+}
+
+
+/* ==================================================
+   LARGE DESKTOP
+================================================== */
+
+@media (min-width: 1440px) {
+
+  .service-detail-hero {
+    max-width: 1400px;
+    height: 760px;
+  }
+
+  .service-detail-text {
+    left: 90px;
+    bottom: 95px;
+  }
+
+  .service-detail-content {
+    max-width: 1040px;
+  }
+}
+
+
+/* ==================================================
+   SMALL LAPTOP
+================================================== */
+
+@media (min-width: 1024px) and (max-width: 1180px) {
+
+  .service-detail-hero {
+    width: calc(100% - 80px);
+    height: 620px;
+
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .service-detail-text {
+    left: 55px;
+    bottom: 65px;
+
+    width: 620px;
+  }
+
+  .service-detail-text h1 {
+    font-size: 60px;
+  }
+
+  .service-detail-content {
+    width: calc(100% - 140px);
+    padding: 58px 62px 65px;
+  }
+}

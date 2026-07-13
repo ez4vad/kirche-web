@@ -1560,3 +1560,809 @@ a.footer-contact-card:hover {
   color: var(--text);
   text-decoration: none;
 }
+
+/* ==================================================
+   DESKTOP VERSION
+   От 1024 px
+================================================== */
+
+@media (min-width: 1024px) {
+
+  /* =========================
+     ОБЩИЕ НАСТРОЙКИ
+  ========================= */
+
+  body {
+    overflow-x: hidden;
+  }
+
+  .section-head {
+    max-width: 1240px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 32px;
+  }
+
+  .section-head h2 {
+    font-size: 38px;
+  }
+
+  .section-head a {
+    font-size: 16px;
+  }
+
+  /* =========================
+     HEADER
+  ========================= */
+
+  .header {
+    top: 20px;
+    left: 50%;
+    right: auto;
+
+    width: calc(100% - 48px);
+    max-width: 1320px;
+    height: 82px;
+
+    padding: 0 22px 0 28px;
+
+    transform: translateX(-50%);
+
+    border-radius: 24px;
+
+    background: rgba(255, 255, 255, 0.14);
+
+    box-shadow:
+      0 18px 45px rgba(0, 0, 0, 0.13);
+  }
+
+  .header.scrolled {
+    background: rgba(255, 255, 255, 0.96);
+  }
+
+  .logo {
+    flex: 0 0 auto;
+  }
+
+  .logo img {
+    height: 170px;
+    margin-top: 12px;
+  }
+
+  /* Бургер на компьютере не нужен */
+
+  .burger {
+    display: none;
+  }
+
+  /* Превращаем мобильное меню
+     в обычную навигацию */
+
+  .mobile-menu {
+    position: static;
+
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    gap: 2px;
+
+    padding: 0;
+    margin-left: 28px;
+
+    border: none;
+    border-radius: 0;
+
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+
+    box-shadow: none;
+
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+
+    transition: none;
+  }
+
+  .mobile-menu a {
+    min-height: 44px;
+
+    padding: 0 12px;
+
+    border-radius: 12px;
+
+    
+
+    font-size: 14px;
+    font-weight: 700;
+
+    white-space: nowrap;
+  }
+
+  .mobile-menu a:hover,
+  .mobile-menu a:focus-visible {
+    padding-left: 12px;
+
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--primary);
+  }
+
+  .mobile-menu .active-link {
+    background: rgba(29, 150, 202, 0.87);
+    color: var(--white);
+  }
+
+  .header.scrolled .mobile-menu a {
+    color: var(--text);
+  }
+
+  .header.scrolled .mobile-menu a:hover,
+  .header.scrolled .mobile-menu a:focus-visible {
+    background: var(--section);
+    color: var(--primary-dark);
+  }
+
+  .header.scrolled .mobile-menu .active-link {
+    background: var(--primary);
+    color: var(--white);
+  }
+
+  .header-donate-btn {
+    flex: 0 0 auto;
+
+    margin-left: 18px;
+    margin-right: 0;
+
+    padding: 13px 20px;
+
+    font-size: 14px;
+  }
+
+  /* Убираем кнопку пожертвования из меню,
+     потому что она уже есть отдельно в шапке */
+
+  .mobile-menu a[href="donate.html"] {
+    display: none;
+  }
+
+  /* =========================
+     БОЛЬШОЙ HERO
+  ========================= */
+
+  .hero-welcome {
+    height: 100vh;
+    min-height: 720px;
+    max-height: 980px;
+  }
+
+  .hero-bg {
+    object-position: center 30%;
+  }
+
+  .hero-overlay {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.72) 0%,
+        rgba(0, 0, 0, 0.38) 48%,
+        rgba(0, 0, 0, 0.10) 100%
+      ),
+      linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.48),
+        transparent 55%
+      );
+  }
+
+  .hero-content {
+    left: 50%;
+    right: auto;
+    bottom: 110px;
+
+    width: calc(100% - 80px);
+    max-width: 1240px;
+
+    transform: translateX(-50%);
+  }
+
+  .hero-content h1 {
+    max-width: 720px;
+
+    margin-bottom: 28px;
+
+    font-size: clamp(64px, 6vw, 92px);
+    line-height: 0.98;
+
+    letter-spacing: -3px;
+  }
+
+  .hero-content p {
+    max-width: 620px;
+
+    font-size: 20px;
+    line-height: 1.7;
+  }
+
+  .hero-buttons {
+    width: auto;
+    max-width: 520px;
+
+    justify-content: flex-start;
+  }
+
+  .hero-buttons a {
+    flex: 0 0 auto;
+
+    min-width: 200px;
+    height: 58px;
+
+    padding: 0 26px;
+
+    border-radius: 16px;
+
+    font-size: 16px;
+  }
+
+  /* =========================
+     СЛАЙДЕР СЛУЖЕНИЙ
+  ========================= */
+
+  .hero-slider {
+    padding: 85px 40px 75px;
+  }
+
+  .cardSwiper {
+    max-width: 1240px;
+    height: 530px;
+
+    margin: 0 auto;
+
+    border-radius: 28px;
+  }
+
+  .hero-card {
+    border-radius: 28px;
+  }
+
+  .hero-card img {
+    transition: transform 0.55s ease;
+  }
+
+  .hero-card:hover img {
+    transform: scale(1.045);
+  }
+
+  .hero-tag {
+    top: 26px;
+    left: 26px;
+
+    padding: 10px 15px;
+
+    font-size: 13px;
+  }
+
+  .hero-info {
+    left: 28px;
+    right: 28px;
+    bottom: 35px;
+  }
+
+  .hero-info h1 {
+    font-size: 34px;
+    line-height: 1.05;
+  }
+
+  .hero-info p {
+    min-height: 68px;
+
+    font-size: 16px;
+    line-height: 1.45;
+  }
+
+  .hero-btn {
+    padding: 13px 20px;
+
+    border-radius: 12px;
+
+    transition:
+      background 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  .hero-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+
+  /* =========================
+     БЫСТРЫЕ ДЕЙСТВИЯ
+  ========================= */
+
+  .home-actions {
+    max-width: 1240px;
+
+    margin: 0 auto;
+
+    padding: 0 40px 80px;
+
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .home-action-card {
+    min-height: 150px;
+
+    padding: 30px 36px;
+
+    border-radius: 28px;
+
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .home-action-card:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+      0 22px 45px rgba(0, 0, 0, 0.13);
+  }
+
+  .home-action-icon {
+    width: 68px;
+    height: 68px;
+    flex-basis: 68px;
+
+    border-radius: 20px;
+
+    font-size: 31px;
+  }
+
+  .home-action-content strong {
+    font-size: 27px;
+  }
+
+  .home-action-content > span {
+    font-size: 16px;
+  }
+
+  /* =========================
+     СОБЫТИЯ
+  ========================= */
+
+  .events {
+    padding: 85px 40px 95px;
+  }
+
+  .events > .events-calendar,
+  .events > .events-list {
+    max-width: 1240px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .events-calendar {
+    gap: 16px;
+
+    overflow: visible;
+
+    margin-bottom: 28px;
+  }
+
+  .day {
+    flex: 1;
+
+    min-width: 0;
+    max-width: 150px;
+    height: 108px;
+
+    border-radius: 22px;
+
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      background 0.25s ease;
+  }
+
+  .day:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+      0 14px 28px rgba(0, 0, 0, 0.09);
+  }
+
+  .day span {
+    font-size: 36px;
+  }
+
+  .events-list {
+    padding: 12px 28px;
+
+    border-radius: 26px;
+  }
+
+  .event-item {
+    align-items: center;
+
+    padding: 25px 0;
+  }
+
+  .event-time {
+    min-width: 100px;
+
+    font-size: 23px;
+  }
+
+  .event-item h3 {
+    font-size: 21px;
+  }
+
+  .event-item p {
+    font-size: 16px;
+  }
+
+  /* =========================
+     ВИДЕО
+  ========================= */
+
+  .videos {
+    padding: 85px 40px 95px;
+  }
+
+  .videos-list {
+    max-width: 1240px;
+
+    margin: 30px auto 0;
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 26px;
+  }
+
+  .video-card {
+    border-radius: 25px;
+
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .video-card:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+      0 20px 42px rgba(0, 0, 0, 0.11);
+  }
+
+  .video-card h3 {
+    padding: 22px 24px;
+
+    font-size: 22px;
+  }
+
+  .play-btn {
+    width: 78px;
+    height: 78px;
+
+    transition:
+      transform 0.25s ease,
+      background 0.25s ease;
+  }
+
+  .video-card:hover .play-btn {
+    transform: scale(1.08);
+    background: var(--primary-dark);
+  }
+
+  .all-videos-btn {
+    width: max-content;
+
+    margin: 35px auto 0;
+
+    padding: 17px 32px;
+  }
+
+  .video-modal-content {
+    max-width: 1100px;
+  }
+
+  /* =========================
+     КОНТАКТЫ И КАРТА
+  ========================= */
+
+  .contacts {
+    padding: 85px 40px 95px;
+
+    display: grid;
+    grid-template-columns: minmax(300px, 0.7fr) minmax(500px, 1.3fr);
+    grid-template-areas:
+      "heading heading"
+      "info map"
+      "route map";
+
+    column-gap: 28px;
+    align-items: start;
+  }
+
+  .contacts > .section-head {
+    grid-area: heading;
+
+    width: 100%;
+  }
+
+  .contact-card {
+    grid-area: info;
+
+    height: 100%;
+    min-height: 230px;
+
+    margin-bottom: 0;
+    padding: 36px;
+
+    border-radius: 26px;
+  }
+
+  .contact-card h3 {
+    font-size: 30px;
+  }
+
+  .contact-card p {
+    font-size: 18px;
+  }
+
+  .map-box {
+    grid-area: map;
+
+    height: 430px;
+
+    border-radius: 26px;
+  }
+
+  .route-btn {
+    grid-area: route;
+
+    margin-top: 18px;
+
+    padding: 18px 25px;
+  }
+
+  /* =========================
+     FOOTER
+  ========================= */
+
+  .footer {
+    margin-top: 100px;
+    padding: 70px 40px 28px;
+  }
+
+  .footer-container {
+    max-width: 1240px;
+
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns:
+      minmax(260px, 1.15fr)
+      minmax(220px, 0.8fr)
+      minmax(320px, 1.25fr);
+
+    align-items: start;
+    gap: 60px;
+  }
+
+  .footer-brand {
+    text-align: left;
+  }
+
+  .footer-logo {
+    width: 125px;
+
+    margin: 0 0 20px;
+  }
+
+  .footer-title {
+    font-size: 20px;
+  }
+
+  .footer-description {
+    max-width: 340px;
+
+    margin: 0;
+  }
+
+  .footer-socials {
+    justify-content: flex-start;
+  }
+
+  .footer-nav-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-contact-card {
+    transition:
+      transform 0.2s ease,
+      background 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .footer-contact-card:hover {
+    transform: translateX(4px);
+  }
+
+  .footer-bottom {
+    max-width: 1240px;
+
+    margin: 45px auto 0;
+    padding-top: 25px;
+
+    flex-direction: row;
+    justify-content: space-between;
+
+    text-align: left;
+  }
+
+  /* =========================
+     NEWS DETAIL DESKTOP
+  ========================= */
+
+  .news-detail-page {
+    padding-top: 120px;
+  }
+
+  .news-detail {
+    max-width: 1180px;
+
+    margin: 0 auto;
+  }
+
+  .news-detail-image {
+    height: 620px;
+
+    border-radius: 28px;
+  }
+
+  .news-detail-image > span {
+    left: 35px;
+    bottom: 30px;
+  }
+
+  .news-detail-content {
+    max-width: 900px;
+
+    margin: -70px auto 0;
+    padding: 55px 65px 80px;
+
+    border-radius: 30px;
+
+    box-shadow:
+      0 20px 55px rgba(0, 0, 0, 0.09);
+  }
+
+  .news-detail-content h1 {
+    font-size: 55px;
+  }
+
+  .news-detail-lead {
+    font-size: 21px;
+  }
+
+  .news-detail-text {
+    font-size: 18px;
+  }
+
+  .news-detail-actions {
+    flex-direction: row;
+  }
+
+  .news-share-button,
+  .news-back-btn {
+    min-width: 190px;
+  }
+
+  .related-news-section {
+    max-width: 1240px;
+
+    margin: 0 auto;
+    padding: 70px 40px 90px;
+  }
+
+  .related-news-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 22px;
+  }
+
+  .related-news-card {
+    display: block;
+
+    border-radius: 22px;
+  }
+
+  .related-news-card > a {
+    height: 210px;
+  }
+
+  .related-news-card > div {
+    padding: 20px;
+  }
+}
+
+
+/* ==================================================
+   LARGE DESKTOP
+   От 1280 px
+================================================== */
+
+@media (min-width: 1280px) {
+
+  .mobile-menu {
+    gap: 5px;
+  }
+
+  .mobile-menu a {
+    padding-left: 15px;
+    padding-right: 15px;
+
+    font-size: 15px;
+  }
+
+  .mobile-menu a:hover,
+  .mobile-menu a:focus-visible {
+    padding-left: 15px;
+  }
+
+  .header-donate-btn {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .contacts {
+    max-width: none;
+  }
+}
+
+
+/* ==================================================
+   НЕБОЛЬШОЙ НОУТБУК
+   Чтобы меню не ломалось
+================================================== */
+
+@media (min-width: 1024px) and (max-width: 1180px) {
+
+  .header {
+    padding-left: 18px;
+    padding-right: 16px;
+  }
+
+  .logo img {
+    height: 145px;
+  }
+
+  .mobile-menu {
+    margin-left: 15px;
+  }
+
+  .mobile-menu a {
+    padding-left: 8px;
+    padding-right: 8px;
+
+    font-size: 12px;
+  }
+
+  .mobile-menu a:hover,
+  .mobile-menu a:focus-visible {
+    padding-left: 8px;
+  }
+
+  .header-donate-btn {
+    margin-left: 8px;
+    padding: 11px 14px;
+
+    font-size: 12px;
+  }
+}

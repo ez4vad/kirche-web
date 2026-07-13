@@ -81,3 +81,295 @@
   border-radius: 16px;
   font-weight: 800;
 }
+
+/* ==================================================
+   SERVICES DESKTOP
+================================================== */
+
+@media (min-width: 1024px) {
+
+  .services-page {
+    padding-top: 120px;
+    background: var(--background);
+  }
+
+  /* =========================
+     HERO
+  ========================= */
+
+  .services-hero {
+    max-width: 1240px;
+    min-height: 470px;
+
+    margin: 40px auto 70px;
+    padding: 85px 90px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    overflow: hidden;
+    position: relative;
+
+    border-radius: 34px;
+
+    background:
+      radial-gradient(
+        circle at 85% 20%,
+        rgba(50, 174, 226, 0.18),
+        transparent 32%
+      ),
+      linear-gradient(
+        135deg,
+        var(--section),
+        var(--white)
+      );
+  }
+
+  .services-hero::after {
+    content: "";
+
+    position: absolute;
+    right: -90px;
+    bottom: -120px;
+
+    width: 360px;
+    height: 360px;
+
+    border-radius: 50%;
+    background: rgba(50, 174, 226, 0.08);
+  }
+
+  .services-hero .about-label {
+    position: relative;
+    z-index: 2;
+
+    font-size: 15px;
+    letter-spacing: 4px;
+  }
+
+  .services-hero h1 {
+    position: relative;
+    z-index: 2;
+
+    max-width: 780px;
+
+    margin-bottom: 28px;
+
+    font-size: clamp(58px, 5.5vw, 78px);
+    line-height: 0.98;
+    letter-spacing: -2.5px;
+  }
+
+  .services-hero > p:last-child {
+    position: relative;
+    z-index: 2;
+
+    max-width: 720px;
+
+    font-size: 20px;
+    line-height: 1.75;
+  }
+
+  /* =========================
+     SERVICES GRID
+  ========================= */
+
+  .services-list {
+    max-width: 1240px;
+
+    margin: 0 auto;
+    padding: 0 40px 100px;
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px;
+  }
+
+  .service-card {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    border-radius: 28px;
+
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .service-card:hover {
+    transform: translateY(-8px);
+
+    box-shadow:
+      0 24px 55px rgba(25, 45, 55, 0.13);
+  }
+
+  .service-card img {
+    height: 320px;
+
+    transition: transform 0.55s ease;
+  }
+
+  .service-card:hover img {
+    transform: scale(1.05);
+  }
+
+  .service-card {
+    overflow: hidden;
+  }
+
+  .service-content {
+    flex: 1;
+
+    padding: 31px 32px 34px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .service-content span {
+    margin-bottom: 14px;
+
+    font-size: 12px;
+    letter-spacing: 2.5px;
+  }
+
+  .service-content h2 {
+    margin-bottom: 14px;
+
+    font-size: 31px;
+    line-height: 1.12;
+  }
+
+  .service-content p {
+    flex: 1;
+
+    margin-bottom: 26px;
+
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .service-content a {
+    padding: 15px 23px;
+
+    border-radius: 14px;
+
+    transition:
+      background 0.25s ease,
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .service-content a:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+
+    box-shadow:
+      0 10px 22px rgba(50, 174, 226, 0.24);
+  }
+
+  /* =========================
+     ПОСЛЕДНЯЯ ШИРОКАЯ КАРТОЧКА
+  ========================= */
+
+  .service-card:last-child {
+    grid-column: 1 / -1;
+
+    min-height: 430px;
+
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1.15fr)
+      minmax(380px, 0.85fr);
+  }
+
+  .service-card:last-child img {
+    height: 100%;
+    min-height: 430px;
+  }
+
+  .service-card:last-child .service-content {
+    justify-content: center;
+
+    padding: 50px;
+  }
+
+  .service-card:last-child .service-content h2 {
+    font-size: 39px;
+  }
+
+  .service-card:last-child .service-content p {
+    flex: 0;
+
+    max-width: 520px;
+
+    font-size: 18px;
+  }
+}
+
+
+/* ==================================================
+   LARGE DESKTOP
+================================================== */
+
+@media (min-width: 1280px) {
+
+  .services-list {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .service-card img {
+    height: 350px;
+  }
+
+  .service-card:last-child img {
+    height: 100%;
+  }
+}
+
+
+/* ==================================================
+   SMALL LAPTOP
+================================================== */
+
+@media (min-width: 1024px) and (max-width: 1180px) {
+
+  .services-hero {
+    width: calc(100% - 80px);
+    padding: 70px;
+  }
+
+  .services-hero h1 {
+    font-size: 58px;
+  }
+
+  .services-list {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  .service-card img {
+    height: 275px;
+  }
+
+  .service-content {
+    padding: 27px;
+  }
+
+  .service-content h2 {
+    font-size: 27px;
+  }
+
+  .service-card:last-child {
+    grid-template-columns: 1fr 0.9fr;
+  }
+
+  .service-card:last-child .service-content {
+    padding: 38px;
+  }
+}

@@ -12,25 +12,30 @@ burgerBtn.addEventListener("click", () => {
 
 const cardSwiper = new Swiper(".cardSwiper", {
   loop: true,
-  speed: 700,
-  spaceBetween: 16,
+  spaceBetween: 14,
+  slidesPerView: 1,
 
   autoplay: {
-    delay: 3500,
-    disableOnInteraction: false,
+    delay: 5000,
+    disableOnInteraction: false
   },
 
   pagination: {
     el: ".swiper-pagination",
-    clickable: true,
+    clickable: true
   },
 
-  navigation: {
-    nextEl: ".swiper-button-next",
-    prevEl: ".swiper-button-prev",
-  },
+  breakpoints: {
+    700: {
+      slidesPerView: 2,
+      spaceBetween: 18
+    },
 
-  
+    1024: {
+      slidesPerView: 3,
+      spaceBetween: 22
+    }
+  }
 });
 
 

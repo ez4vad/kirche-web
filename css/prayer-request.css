@@ -307,3 +307,355 @@
   font-weight: 800;
   text-decoration: none;
 }
+
+/* ==================================================
+   PRAYER REQUEST DESKTOP
+================================================== */
+
+@media (min-width:1024px){
+
+.prayer-page{
+
+    padding-top:120px;
+
+    background:var(--background);
+
+}
+
+/* HERO */
+
+.prayer-hero{
+
+    position:relative;
+
+    overflow:hidden;
+
+    max-width:1240px;
+
+    min-height:430px;
+
+    margin:40px auto 70px;
+
+    padding:90px;
+
+    border-radius:34px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    background:
+
+    radial-gradient(circle at 85% 18%,
+    rgba(50,174,226,.18),
+    transparent 30%),
+
+    linear-gradient(
+    135deg,
+    var(--section),
+    white);
+
+}
+
+.prayer-hero::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:350px;
+
+    height:350px;
+
+    border-radius:50%;
+
+    right:-90px;
+
+    bottom:-100px;
+
+    background:rgba(50,174,226,.08);
+
+}
+
+.prayer-hero-icon{
+
+    width:86px;
+
+    height:86px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:24px;
+
+    font-size:42px;
+
+    margin-bottom:26px;
+
+    background:white;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+
+}
+
+.prayer-hero h1{
+
+    font-size:74px;
+
+    line-height:.95;
+
+    margin-bottom:25px;
+
+}
+
+.prayer-hero p:last-child{
+
+    max-width:700px;
+
+    font-size:20px;
+
+    line-height:1.75;
+
+}
+
+/* ОСНОВНОЙ БЛОК */
+
+.prayer-content{
+
+    max-width:1240px;
+
+    margin:auto;
+
+    padding:0 40px 100px;
+
+    display:grid;
+
+    grid-template-columns:
+
+    380px
+
+    1fr;
+
+    gap:32px;
+
+    align-items:start;
+
+}
+
+/* Левая колонка */
+
+.prayer-intro-card,
+
+.prayer-contact-card{
+
+    margin:0;
+
+    border-radius:28px;
+
+    padding:34px;
+
+}
+
+.prayer-intro-card{
+
+    min-height:340px;
+
+}
+
+.prayer-contact-card{
+
+    margin-top: -650px;
+
+}
+
+/* Форма */
+
+.prayer-form{
+
+    margin:0;
+
+    border-radius:30px;
+
+    padding:42px;
+
+    box-shadow:
+
+    0 18px 50px rgba(0,0,0,.08);
+
+}
+
+.form-heading{
+
+    margin-bottom:35px;
+
+}
+
+.form-heading span{
+
+    font-size:13px;
+
+}
+
+.form-heading h2{
+
+    font-size:36px;
+
+}
+
+.form-group{
+
+    margin-bottom:24px;
+
+}
+
+.form-group input,
+
+.form-group textarea{
+
+    padding:18px 20px;
+
+    font-size:16px;
+
+    border-radius:16px;
+
+}
+
+.form-group textarea{
+
+    min-height:220px;
+
+}
+
+.anonymous-option,
+
+.privacy-option{
+
+    padding:16px 0;
+
+}
+
+.prayer-submit-btn{
+
+    margin-top:30px;
+
+    min-height:60px;
+
+    font-size:17px;
+
+    border-radius:18px;
+
+    transition:.25s;
+
+}
+
+.prayer-submit-btn:hover{
+
+    transform:translateY(-2px);
+
+    background:var(--primary-dark);
+
+}
+
+.prayer-success{
+
+    margin:0;
+
+    border-radius:30px;
+
+    padding:70px;
+
+}
+
+.prayer-success h2{
+
+    font-size:42px;
+
+}
+
+.prayer-success p{
+
+    font-size:18px;
+
+}
+
+.send-another-btn{
+
+    margin-top:30px;
+
+}
+
+/* Красивые карточки */
+
+.prayer-intro-card,
+
+.prayer-contact-card,
+
+.prayer-form{
+
+    transition:
+
+    transform .3s,
+
+    box-shadow .3s;
+
+}
+
+.prayer-intro-card:hover,
+
+.prayer-contact-card:hover,
+
+.prayer-form:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+
+    0 22px 55px rgba(0,0,0,.09);
+
+}
+
+}
+
+
+/* ==================================================
+   NOTEBOOK
+================================================== */
+
+@media (min-width:1024px) and (max-width:1180px){
+
+.prayer-hero{
+
+    margin:35px 40px 60px;
+
+    padding:70px;
+
+}
+
+.prayer-hero h1{
+
+    font-size:58px;
+
+}
+
+.prayer-content{
+
+    grid-template-columns:
+
+    330px
+
+    1fr;
+
+}
+
+.prayer-form{
+
+    padding:34px;
+
+}
+
+}

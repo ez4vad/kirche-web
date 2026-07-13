@@ -30,3 +30,48 @@ copyButtons.forEach((button) => {
     }
   });
 });
+
+document
+  .querySelectorAll(".copy-button")
+  .forEach((button) => {
+    button.addEventListener(
+      "click",
+      async () => {
+        const value =
+          button.dataset.copy || "";
+
+        const originalText =
+          button.textContent;
+
+        try {
+          await navigator.clipboard.writeText(
+            value
+          );
+
+          button.textContent = "Скопировано";
+          button.classList.add("copied");
+
+          setTimeout(() => {
+            button.textContent =
+              originalText;
+
+            button.classList.remove(
+              "copied"
+            );
+          }, 1800);
+        } catch (error) {
+          console.error(
+            "Не удалось скопировать:",
+            error
+          );
+
+          button.textContent = "Ошибка";
+
+          setTimeout(() => {
+            button.textContent =
+              originalText;
+          }, 1800);
+        }
+      }
+    );
+  });
