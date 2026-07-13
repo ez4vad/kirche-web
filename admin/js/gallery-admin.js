@@ -80,13 +80,10 @@ adminSidebarOverlay?.addEventListener(
 adminLogoutButton?.addEventListener(
   "click",
   () => {
-    sessionStorage.removeItem(
-      "temporaryAdminAccess"
-    );
-
-    window.location.href = "login.html";
+    AdminAuth.logoutAdmin();
   }
 );
+AdminAuth.requireAdminSession();
 
 /* =========================
    ЭЛЕМЕНТЫ СТРАНИЦЫ

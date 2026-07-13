@@ -52,11 +52,13 @@ adminSidebarOverlay?.addEventListener(
   "click",
   closeAdminSidebar
 );
-
-adminLogoutButton?.addEventListener("click", () => {
-  sessionStorage.removeItem("temporaryAdminAccess");
-  window.location.href = "login.html";
-});
+AdminAuth.requireAdminSession();
+adminLogoutButton?.addEventListener(
+  "click",
+  () => {
+    AdminAuth.logoutAdmin();
+  }
+);
 
 /* =========================
    QUILL

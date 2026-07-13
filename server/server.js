@@ -1,181 +1,271 @@
+require("dotenv").config();
+
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const multer = require("multer");
+const bcrypt = require("bcryptjs");
+const session = require("express-session");
+const rateLimit = require("express-rate-limit");
+const Database = require("better-sqlite3");
 
 const db = require("./database");
 
-const app = express();
-const PORT = 3000;
-
-const projectRoot = path.join(__dirname, "..");
+const SqliteSessionStore =
+  require("better-sqlite3-session-store")(session);
 
 /* =========================
    ОСНОВНЫЕ НАСТРОЙКИ
 ========================= */
 
-app.use(express.json());
+const app = express();
+
+const PORT =
+  Number(process.env.PORT) || 3000;
+
+const isProduction =
+  process.env.NODE_ENV === "production";
+
+const sessionSecret =
+  String(process.env.SESSION_SECRET || "");
+
+const projectRoot =
+  path.join(__dirname, "..");
+
+if (sessionSecret.length < 32) {
+  throw new Error(
+    "SESSION_SECRET отсутствует или слишком короткий. " +
+    "Добавьте в .env строку минимум из 32 символов."
+  );
+}
 
 /*
-  Раздаём обычные файлы сайта:
-  HTML, CSS, JS, images и другие папки.
+  На localhost эта настройка не используется.
+
+  После публикации сайта, если перед Node.js
+  находится один доверенный Nginx или прокси хостинга,
+  Express сможет правильно определить HTTPS.
 */
-app.use(express.static(projectRoot));
+if (isProduction) {
+  app.set("trust proxy", 1);
+}
 
 /* =========================
-   ЗАГРУЗКА ФОТОГРАФИЙ НОВОСТЕЙ
+   ПАПКИ ПРОЕКТА
 ========================= */
 
-const newsUploadsDirectory = path.join(
-  projectRoot,
-  "uploads",
-  "news"
-);
+const uploadsDirectory =
+  path.join(projectRoot, "uploads");
 
-/*
-  Если папки ещё нет, сервер создаст её сам.
-*/
+const newsUploadsDirectory =
+  path.join(uploadsDirectory, "news");
+
+const galleryUploadsDirectory =
+  path.join(uploadsDirectory, "gallery");
+
 fs.mkdirSync(newsUploadsDirectory, {
   recursive: true
 });
-
-/*
-  Явно разрешаем браузеру открывать файлы
-  по адресу /uploads/...
-*/
-app.use(
-  "/uploads",
-  express.static(
-    path.join(projectRoot, "uploads")
-  )
-);
-
-const allowedNewsImageTypes = new Map([
-  ["image/jpeg", ".jpg"],
-  ["image/png", ".png"],
-  ["image/webp", ".webp"]
-]);
-
-const newsImageStorage = multer.diskStorage({
-  destination(req, file, callback) {
-    callback(null, newsUploadsDirectory);
-  },
-
-  filename(req, file, callback) {
-    const extension =
-      allowedNewsImageTypes.get(file.mimetype);
-
-    if (!extension) {
-      callback(
-        new Error(
-          "Разрешены только JPG, PNG и WEBP."
-        )
-      );
-
-      return;
-    }
-
-    const filename =
-      `${Date.now()}-${crypto.randomUUID()}${extension}`;
-
-    callback(null, filename);
-  }
-});
-
-const uploadNewsImage = multer({
-  storage: newsImageStorage,
-
-  limits: {
-    fileSize: 5 * 1024 * 1024
-  },
-
-  fileFilter(req, file, callback) {
-    if (
-      !allowedNewsImageTypes.has(
-        file.mimetype
-      )
-    ) {
-      callback(
-        new Error(
-          "Разрешены только JPG, PNG и WEBP."
-        )
-      );
-
-      return;
-    }
-
-    callback(null, true);
-  }
-});
-
-/* =========================
-   ЗАГРУЗКА ФОТО ГАЛЕРЕИ
-========================= */
-
-const galleryUploadsDirectory = path.join(
-  projectRoot,
-  "uploads",
-  "gallery"
-);
 
 fs.mkdirSync(galleryUploadsDirectory, {
   recursive: true
 });
 
-const galleryImageStorage = multer.diskStorage({
-  destination(req, file, callback) {
-    callback(null, galleryUploadsDirectory);
-  },
+/* =========================
+   ХРАНИЛИЩЕ СЕССИЙ
+========================= */
 
-  filename(req, file, callback) {
-    const extension =
-      allowedNewsImageTypes.get(file.mimetype);
+const sessionsDatabase =
+  new Database(
+    path.join(__dirname, "sessions.db")
+  );
 
-    if (!extension) {
-      callback(
-        new Error(
-          "Разрешены только JPG, PNG и WEBP."
-        )
-      );
+const sessionStore =
+  new SqliteSessionStore({
+    client: sessionsDatabase,
 
-      return;
+    expired: {
+      clear: true,
+      intervalMs: 15 * 60 * 1000
     }
+  });
 
-    const filename =
-      `${Date.now()}-${crypto.randomUUID()}${extension}`;
+/* =========================
+   ОСНОВНЫЕ MIDDLEWARE
+========================= */
 
-    callback(null, filename);
+/*
+  Сервер принимает JSON.
+*/
+app.use(
+  express.json({
+    limit: "1mb"
+  })
+);
+
+app.use(
+  express.urlencoded({
+    extended: false,
+    limit: "1mb"
+  })
+);
+
+/*
+  Защищённая cookie-сессия.
+*/
+app.use(
+  session({
+    name: "philadelphia.admin.sid",
+
+    secret: sessionSecret,
+
+    store: sessionStore,
+
+    resave: false,
+
+    saveUninitialized: false,
+
+    rolling: true,
+
+    cookie: {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 8 * 60 * 60 * 1000
+    }
+  })
+);
+
+/*
+  Раздаём загруженные изображения.
+*/
+app.use(
+  "/uploads",
+  express.static(uploadsDirectory, {
+    fallthrough: false,
+    maxAge: isProduction
+      ? "7d"
+      : 0
+  })
+);
+
+/*
+  Раздаём HTML, CSS, JS и images.
+*/
+app.use(
+  express.static(projectRoot, {
+    index: "index.html"
+  })
+);
+
+/* =========================
+   ОГРАНИЧЕНИЕ ПОПЫТОК ВХОДА
+========================= */
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  message: {
+    error:
+      "Слишком много попыток входа. " +
+      "Попробуйте снова через 15 минут."
   }
 });
 
+/* =========================
+   НАСТРОЙКА ЗАГРУЗКИ ФОТО
+========================= */
+
+const allowedImageTypes = new Map([
+  ["image/jpeg", ".jpg"],
+  ["image/png", ".png"],
+  ["image/webp", ".webp"]
+]);
+
+function createImageStorage(directory) {
+  return multer.diskStorage({
+    destination(req, file, callback) {
+      callback(null, directory);
+    },
+
+    filename(req, file, callback) {
+      const extension =
+        allowedImageTypes.get(file.mimetype);
+
+      if (!extension) {
+        callback(
+          new Error(
+            "Разрешены только JPG, PNG и WEBP."
+          )
+        );
+
+        return;
+      }
+
+      const filename =
+        `${Date.now()}-${crypto.randomUUID()}${extension}`;
+
+      callback(null, filename);
+    }
+  });
+}
+
+function imageFileFilter(
+  req,
+  file,
+  callback
+) {
+  if (
+    !allowedImageTypes.has(file.mimetype)
+  ) {
+    callback(
+      new Error(
+        "Разрешены только JPG, PNG и WEBP."
+      )
+    );
+
+    return;
+  }
+
+  callback(null, true);
+}
+
+const uploadNewsImage = multer({
+  storage:
+    createImageStorage(
+      newsUploadsDirectory
+    ),
+
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+    files: 1
+  },
+
+  fileFilter: imageFileFilter
+});
+
 const uploadGalleryImages = multer({
-  storage: galleryImageStorage,
+  storage:
+    createImageStorage(
+      galleryUploadsDirectory
+    ),
 
   limits: {
     fileSize: 5 * 1024 * 1024,
     files: 20
   },
 
-  fileFilter(req, file, callback) {
-    if (
-      !allowedNewsImageTypes.has(file.mimetype)
-    ) {
-      callback(
-        new Error(
-          "Разрешены только JPG, PNG и WEBP."
-        )
-      );
-
-      return;
-    }
-
-    callback(null, true);
-  }
+  fileFilter: imageFileFilter
 });
 
 /* =========================
-   ПОДГОТОВКА ДАННЫХ СОБЫТИЙ
+   НОРМАЛИЗАЦИЯ ДАННЫХ
 ========================= */
 
 function normalizeEvent(row) {
@@ -192,73 +282,6 @@ function normalizeEvent(row) {
   };
 }
 
-function validateEvent(body) {
-  const title = String(
-    body.title || ""
-  ).trim();
-
-  const date = String(
-    body.date || ""
-  ).trim();
-
-  const time = String(
-    body.time || ""
-  ).trim();
-
-  const place = String(
-    body.place || ""
-  ).trim();
-
-  const description = String(
-    body.description || ""
-  ).trim();
-
-  const published =
-    body.published !== false;
-
-  if (!title || !date || !time || !place) {
-    return {
-      error:
-        "Название, дата, время и адрес обязательны."
-    };
-  }
-
-  const datePattern =
-    /^\d{4}-\d{2}-\d{2}$/;
-
-  const timePattern =
-    /^\d{2}:\d{2}$/;
-
-  if (!datePattern.test(date)) {
-    return {
-      error:
-        "Дата должна быть в формате YYYY-MM-DD."
-    };
-  }
-
-  if (!timePattern.test(time)) {
-    return {
-      error:
-        "Время должно быть в формате HH:MM."
-    };
-  }
-
-  return {
-    value: {
-      title,
-      date,
-      time,
-      place,
-      description,
-      published
-    }
-  };
-}
-
-/* =========================
-   ПОДГОТОВКА ДАННЫХ НОВОСТЕЙ
-========================= */
-
 function normalizeNews(row) {
   return {
     id: row.id,
@@ -274,6 +297,7 @@ function normalizeNews(row) {
     updatedAt: row.updated_at
   };
 }
+
 function normalizeGalleryItem(row) {
   return {
     id: row.id,
@@ -299,34 +323,92 @@ function normalizePrayerRequest(row) {
   };
 }
 
+/* =========================
+   ПРОВЕРКА ДАННЫХ
+========================= */
+
+function validateEvent(body) {
+  const title =
+    String(body.title || "").trim();
+
+  const date =
+    String(body.date || "").trim();
+
+  const time =
+    String(body.time || "").trim();
+
+  const place =
+    String(body.place || "").trim();
+
+  const description =
+    String(body.description || "").trim();
+
+  const published =
+    body.published !== false;
+
+  if (
+    !title ||
+    !date ||
+    !time ||
+    !place
+  ) {
+    return {
+      error:
+        "Название, дата, время и адрес обязательны."
+    };
+  }
+
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(date)
+  ) {
+    return {
+      error:
+        "Дата должна быть в формате YYYY-MM-DD."
+    };
+  }
+
+  if (
+    !/^\d{2}:\d{2}$/.test(time)
+  ) {
+    return {
+      error:
+        "Время должно быть в формате HH:MM."
+    };
+  }
+
+  return {
+    value: {
+      title,
+      date,
+      time,
+      place,
+      description,
+      published
+    }
+  };
+}
+
 function validateNews(body) {
-  const title = String(
-    body.title || ""
-  ).trim();
+  const title =
+    String(body.title || "").trim();
 
-  const category = String(
-    body.category || ""
-  ).trim();
+  const category =
+    String(body.category || "").trim();
 
-  const excerpt = String(
-    body.excerpt || ""
-  ).trim();
+  const excerpt =
+    String(body.excerpt || "").trim();
 
-  const content = String(
-    body.content || ""
-  ).trim();
+  const content =
+    String(body.content || "").trim();
 
-  const image = String(
-    body.image || ""
-  ).trim();
+  const image =
+    String(body.image || "").trim();
 
-  const author = String(
-    body.author || ""
-  ).trim();
+  const author =
+    String(body.author || "").trim();
 
-  const date = String(
-    body.date || ""
-  ).trim();
+  const date =
+    String(body.date || "").trim();
 
   const published =
     body.published !== false;
@@ -339,14 +421,14 @@ function validateNews(body) {
   ) {
     return {
       error:
-        "Заголовок, краткое описание, полный текст и дата обязательны."
+        "Заголовок, краткое описание, " +
+        "полный текст и дата обязательны."
     };
   }
 
-  const datePattern =
-    /^\d{4}-\d{2}-\d{2}$/;
-
-  if (!datePattern.test(date)) {
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(date)
+  ) {
     return {
       error:
         "Дата должна быть в формате YYYY-MM-DD."
@@ -368,6 +450,216 @@ function validateNews(body) {
 }
 
 /* =========================
+   ПРОВЕРКА АВТОРИЗАЦИИ
+========================= */
+
+function requireAdmin(req, res, next) {
+  if (
+    req.session?.admin?.id
+  ) {
+    return next();
+  }
+
+  return res.status(401).json({
+    error:
+      "Требуется вход администратора."
+  });
+}
+
+/* =========================
+   АВТОРИЗАЦИЯ
+========================= */
+
+app.post(
+  "/api/auth/login",
+  loginLimiter,
+  async (req, res) => {
+    try {
+      const username =
+        String(
+          req.body.username || ""
+        ).trim();
+
+      const password =
+        String(
+          req.body.password || ""
+        );
+
+      if (!username || !password) {
+        return res.status(400).json({
+          error:
+            "Введите логин и пароль."
+        });
+      }
+
+      const admin = db
+        .prepare(`
+          SELECT
+            id,
+            username,
+            password_hash,
+            is_active
+          FROM admins
+          WHERE username = ?
+        `)
+        .get(username);
+
+      if (
+        !admin ||
+        !Boolean(admin.is_active)
+      ) {
+        return res.status(401).json({
+          error:
+            "Неверный логин или пароль."
+        });
+      }
+
+      const passwordIsCorrect =
+        await bcrypt.compare(
+          password,
+          admin.password_hash
+        );
+
+      if (!passwordIsCorrect) {
+        return res.status(401).json({
+          error:
+            "Неверный логин или пароль."
+        });
+      }
+
+      req.session.regenerate(
+        (regenerateError) => {
+          if (regenerateError) {
+            console.error(
+              "Ошибка создания сессии:",
+              regenerateError
+            );
+
+            return res.status(500).json({
+              error:
+                "Не удалось выполнить вход."
+            });
+          }
+
+          req.session.admin = {
+            id: admin.id,
+            username: admin.username
+          };
+
+          req.session.save(
+            (saveError) => {
+              if (saveError) {
+                console.error(
+                  "Ошибка сохранения сессии:",
+                  saveError
+                );
+
+                return res
+                  .status(500)
+                  .json({
+                    error:
+                      "Не удалось сохранить вход."
+                  });
+              }
+
+              db.prepare(`
+                UPDATE admins
+                SET
+                  last_login_at =
+                    CURRENT_TIMESTAMP,
+                  updated_at =
+                    CURRENT_TIMESTAMP
+                WHERE id = ?
+              `).run(admin.id);
+
+              return res.json({
+                authenticated: true,
+
+                admin: {
+                  id: admin.id,
+                  username:
+                    admin.username
+                }
+              });
+            }
+          );
+        }
+      );
+    } catch (error) {
+      console.error(
+        "Ошибка входа администратора:",
+        error
+      );
+
+      return res.status(500).json({
+        error:
+          "Не удалось выполнить вход."
+      });
+    }
+  }
+);
+
+app.get(
+  "/api/auth/me",
+  (req, res) => {
+    if (!req.session?.admin) {
+      return res.status(401).json({
+        authenticated: false
+      });
+    }
+
+    return res.json({
+      authenticated: true,
+      admin: req.session.admin
+    });
+  }
+);
+
+app.post(
+  "/api/auth/logout",
+  (req, res) => {
+    if (!req.session) {
+      return res.status(204).send();
+    }
+
+    req.session.destroy((error) => {
+      if (error) {
+        console.error(
+          "Ошибка выхода:",
+          error
+        );
+
+        return res.status(500).json({
+          error:
+            "Не удалось выполнить выход."
+        });
+      }
+
+      res.clearCookie(
+        "philadelphia.admin.sid",
+        {
+          httpOnly: true,
+          secure: isProduction,
+          sameSite: "lax",
+          path: "/"
+        }
+      );
+
+      return res.status(204).send();
+    });
+  }
+);
+
+/*
+  Все маршруты, начинающиеся с /api/admin,
+  после этой строки требуют авторизации.
+*/
+app.use(
+  "/api/admin",
+  requireAdmin
+);
+
+/* =========================
    ПУБЛИЧНЫЕ СОБЫТИЯ
 ========================= */
 
@@ -382,7 +674,7 @@ app.get("/api/events", (req, res) => {
       `)
       .all();
 
-    res.json(
+    return res.json(
       rows.map(normalizeEvent)
     );
   } catch (error) {
@@ -391,7 +683,7 @@ app.get("/api/events", (req, res) => {
       error
     );
 
-    res.status(500).json({
+    return res.status(500).json({
       error:
         "Не удалось загрузить события."
     });
@@ -414,7 +706,7 @@ app.get(
         `)
         .all();
 
-      res.json(
+      return res.json(
         rows.map(normalizeEvent)
       );
     } catch (error) {
@@ -423,7 +715,7 @@ app.get(
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось загрузить события."
       });
@@ -476,7 +768,7 @@ app.post(
         `)
         .get(result.lastInsertRowid);
 
-      res
+      return res
         .status(201)
         .json(
           normalizeEvent(createdEvent)
@@ -487,7 +779,7 @@ app.post(
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось создать событие."
       });
@@ -502,7 +794,10 @@ app.put(
       const eventId =
         Number(req.params.id);
 
-      if (!Number.isInteger(eventId)) {
+      if (
+        !Number.isInteger(eventId) ||
+        eventId <= 0
+      ) {
         return res.status(400).json({
           error:
             "Некорректный ID события."
@@ -565,7 +860,7 @@ app.put(
         `)
         .get(eventId);
 
-      res.json(
+      return res.json(
         normalizeEvent(updatedEvent)
       );
     } catch (error) {
@@ -574,7 +869,7 @@ app.put(
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось обновить событие."
       });
@@ -589,7 +884,10 @@ app.delete(
       const eventId =
         Number(req.params.id);
 
-      if (!Number.isInteger(eventId)) {
+      if (
+        !Number.isInteger(eventId) ||
+        eventId <= 0
+      ) {
         return res.status(400).json({
           error:
             "Некорректный ID события."
@@ -610,14 +908,14 @@ app.delete(
         });
       }
 
-      res.status(204).send();
+      return res.status(204).send();
     } catch (error) {
       console.error(
         "Ошибка удаления события:",
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось удалить событие."
       });
@@ -640,11 +938,7 @@ app.post(
       });
     }
 
-    /*
-      Возвращаем путь, который браузер
-      может открыть напрямую.
-    */
-    res.status(201).json({
+    return res.status(201).json({
       image:
         `/uploads/news/${req.file.filename}`
     });
@@ -666,7 +960,7 @@ app.get("/api/news", (req, res) => {
       `)
       .all();
 
-    res.json(
+    return res.json(
       rows.map(normalizeNews)
     );
   } catch (error) {
@@ -675,7 +969,7 @@ app.get("/api/news", (req, res) => {
       error
     );
 
-    res.status(500).json({
+    return res.status(500).json({
       error:
         "Не удалось загрузить новости."
     });
@@ -689,7 +983,10 @@ app.get(
       const newsId =
         Number(req.params.id);
 
-      if (!Number.isInteger(newsId)) {
+      if (
+        !Number.isInteger(newsId) ||
+        newsId <= 0
+      ) {
         return res.status(400).json({
           error:
             "Некорректный ID новости."
@@ -712,7 +1009,7 @@ app.get(
         });
       }
 
-      res.json(
+      return res.json(
         normalizeNews(row)
       );
     } catch (error) {
@@ -721,7 +1018,7 @@ app.get(
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось загрузить новость."
       });
@@ -745,7 +1042,7 @@ app.get(
         `)
         .all();
 
-      res.json(
+      return res.json(
         rows.map(normalizeNews)
       );
     } catch (error) {
@@ -754,7 +1051,7 @@ app.get(
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось загрузить новости."
       });
@@ -769,7 +1066,10 @@ app.get(
       const newsId =
         Number(req.params.id);
 
-      if (!Number.isInteger(newsId)) {
+      if (
+        !Number.isInteger(newsId) ||
+        newsId <= 0
+      ) {
         return res.status(400).json({
           error:
             "Некорректный ID новости."
@@ -791,7 +1091,7 @@ app.get(
         });
       }
 
-      res.json(
+      return res.json(
         normalizeNews(row)
       );
     } catch (error) {
@@ -800,7 +1100,7 @@ app.get(
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось загрузить новость."
       });
@@ -857,7 +1157,7 @@ app.post(
         `)
         .get(result.lastInsertRowid);
 
-      res
+      return res
         .status(201)
         .json(
           normalizeNews(createdNews)
@@ -868,7 +1168,7 @@ app.post(
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось создать новость."
       });
@@ -883,7 +1183,10 @@ app.put(
       const newsId =
         Number(req.params.id);
 
-      if (!Number.isInteger(newsId)) {
+      if (
+        !Number.isInteger(newsId) ||
+        newsId <= 0
+      ) {
         return res.status(400).json({
           error:
             "Некорректный ID новости."
@@ -892,7 +1195,7 @@ app.put(
 
       const existingNews = db
         .prepare(`
-          SELECT id
+          SELECT *
           FROM news
           WHERE id = ?
         `)
@@ -950,7 +1253,7 @@ app.put(
         `)
         .get(newsId);
 
-      res.json(
+      return res.json(
         normalizeNews(updatedNews)
       );
     } catch (error) {
@@ -959,7 +1262,7 @@ app.put(
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось изменить новость."
       });
@@ -974,41 +1277,70 @@ app.delete(
       const newsId =
         Number(req.params.id);
 
-      if (!Number.isInteger(newsId)) {
+      if (
+        !Number.isInteger(newsId) ||
+        newsId <= 0
+      ) {
         return res.status(400).json({
           error:
             "Некорректный ID новости."
         });
       }
 
-      const result = db
+      const newsItem = db
         .prepare(`
-          DELETE FROM news
+          SELECT image
+          FROM news
           WHERE id = ?
         `)
-        .run(newsId);
+        .get(newsId);
 
-      if (result.changes === 0) {
+      if (!newsItem) {
         return res.status(404).json({
           error:
             "Новость не найдена."
         });
       }
 
-      res.status(204).send();
+      db.prepare(`
+        DELETE FROM news
+        WHERE id = ?
+      `).run(newsId);
+
+      if (
+        newsItem.image &&
+        newsItem.image.startsWith(
+          "/uploads/news/"
+        )
+      ) {
+        const filename =
+          path.basename(newsItem.image);
+
+        const filePath = path.join(
+          newsUploadsDirectory,
+          filename
+        );
+
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      }
+
+      return res.status(204).send();
     } catch (error) {
       console.error(
         "Ошибка удаления новости:",
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось удалить новость."
       });
     }
   }
 );
+
 /* =========================
    ПУБЛИЧНАЯ ГАЛЕРЕЯ
 ========================= */
@@ -1024,7 +1356,7 @@ app.get("/api/gallery", (req, res) => {
       `)
       .all();
 
-    res.json(
+    return res.json(
       rows.map(normalizeGalleryItem)
     );
   } catch (error) {
@@ -1033,7 +1365,7 @@ app.get("/api/gallery", (req, res) => {
       error
     );
 
-    res.status(500).json({
+    return res.status(500).json({
       error:
         "Не удалось загрузить галерею."
     });
@@ -1056,7 +1388,7 @@ app.get(
         `)
         .all();
 
-      res.json(
+      return res.json(
         rows.map(normalizeGalleryItem)
       );
     } catch (error) {
@@ -1065,7 +1397,7 @@ app.get(
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось загрузить фотографии."
       });
@@ -1074,7 +1406,7 @@ app.get(
 );
 
 /* =========================
-   ЗАГРУЗКА НЕСКОЛЬКИХ ФОТО
+   ЗАГРУЗКА ФОТО В ГАЛЕРЕЮ
 ========================= */
 
 app.post(
@@ -1082,69 +1414,116 @@ app.post(
   uploadGalleryImages.array("images", 20),
   (req, res) => {
     try {
-      if (
-        !req.files ||
-        req.files.length === 0
-      ) {
+      const files =
+        Array.isArray(req.files)
+          ? req.files
+          : [];
+
+      if (files.length === 0) {
         return res.status(400).json({
           error:
             "Фотографии не были выбраны."
         });
       }
 
-      const title = String(
-        req.body.title || ""
-      ).trim();
-
-      const category = String(
-        req.body.category || "Община"
-      ).trim();
-
-      const insertPhoto = db.prepare(`
-        INSERT INTO gallery (
-          image,
-          title,
-          category,
-          published
+      const title =
+        String(
+          req.body.title || ""
         )
-        VALUES (?, ?, ?, 1)
-      `);
+          .trim()
+          .slice(0, 150);
+
+      const category =
+        String(
+          req.body.category || "Община"
+        )
+          .trim()
+          .slice(0, 100);
+
+      const insertPhoto =
+        db.prepare(`
+          INSERT INTO gallery (
+            image,
+            title,
+            category,
+            published
+          )
+          VALUES (?, ?, ?, 1)
+        `);
+
+      const selectPhoto =
+        db.prepare(`
+          SELECT *
+          FROM gallery
+          WHERE id = ?
+        `);
 
       const insertMany =
-        db.transaction((files) => {
-          return files.map((file) => {
-            const imagePath =
-              `/uploads/gallery/${file.filename}`;
+        db.transaction(
+          (uploadedFiles) => {
+            return uploadedFiles.map(
+              (file) => {
+                const imagePath =
+                  `/uploads/gallery/${file.filename}`;
 
-            const result = insertPhoto.run(
-              imagePath,
-              title,
-              category
+                const result =
+                  insertPhoto.run(
+                    imagePath,
+                    title,
+                    category
+                  );
+
+                const row =
+                  selectPhoto.get(
+                    result.lastInsertRowid
+                  );
+
+                return normalizeGalleryItem(
+                  row
+                );
+              }
             );
-
-            const row = db
-              .prepare(`
-                SELECT *
-                FROM gallery
-                WHERE id = ?
-              `)
-              .get(result.lastInsertRowid);
-
-            return normalizeGalleryItem(row);
-          });
-        });
+          }
+        );
 
       const createdItems =
-        insertMany(req.files);
+        insertMany(files);
 
-      res.status(201).json(createdItems);
+      return res
+        .status(201)
+        .json(createdItems);
     } catch (error) {
       console.error(
         "Ошибка загрузки фотографий:",
         error
       );
 
-      res.status(500).json({
+      /*
+        Если запись в базу не удалась,
+        удаляем уже загруженные файлы.
+      */
+      const files =
+        Array.isArray(req.files)
+          ? req.files
+          : [];
+
+      files.forEach((file) => {
+        try {
+          if (
+            file.path &&
+            fs.existsSync(file.path)
+          ) {
+            fs.unlinkSync(file.path);
+          }
+        } catch (unlinkError) {
+          console.error(
+            "Не удалось удалить файл после ошибки:",
+            unlinkError
+          );
+        }
+      });
+
+      return res.status(500).json({
         error:
           "Не удалось сохранить фотографии."
       });
@@ -1163,7 +1542,10 @@ app.put(
       const galleryId =
         Number(req.params.id);
 
-      if (!Number.isInteger(galleryId)) {
+      if (
+        !Number.isInteger(galleryId) ||
+        galleryId <= 0
+      ) {
         return res.status(400).json({
           error:
             "Некорректный ID фотографии."
@@ -1185,14 +1567,23 @@ app.put(
         });
       }
 
-      const title = String(
-        req.body.title ?? existingItem.title
-      ).trim();
+      const title =
+        String(
+          req.body.title ??
+          existingItem.title ??
+          ""
+        )
+          .trim()
+          .slice(0, 150);
 
-      const category = String(
-        req.body.category ??
-        existingItem.category
-      ).trim();
+      const category =
+        String(
+          req.body.category ??
+          existingItem.category ??
+          "Община"
+        )
+          .trim()
+          .slice(0, 100);
 
       const published =
         req.body.published !== false;
@@ -1220,8 +1611,10 @@ app.put(
         `)
         .get(galleryId);
 
-      res.json(
-        normalizeGalleryItem(updatedItem)
+      return res.json(
+        normalizeGalleryItem(
+          updatedItem
+        )
       );
     } catch (error) {
       console.error(
@@ -1229,7 +1622,7 @@ app.put(
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось изменить фотографию."
       });
@@ -1248,7 +1641,10 @@ app.delete(
       const galleryId =
         Number(req.params.id);
 
-      if (!Number.isInteger(galleryId)) {
+      if (
+        !Number.isInteger(galleryId) ||
+        galleryId <= 0
+      ) {
         return res.status(400).json({
           error:
             "Некорректный ID фотографии."
@@ -1284,24 +1680,32 @@ app.delete(
         const filename =
           path.basename(item.image);
 
-        const filePath = path.join(
-          galleryUploadsDirectory,
-          filename
-        );
+        const filePath =
+          path.join(
+            galleryUploadsDirectory,
+            filename
+          );
 
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
+        try {
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        } catch (unlinkError) {
+          console.error(
+            "Не удалось удалить файл галереи:",
+            unlinkError
+          );
         }
       }
 
-      res.status(204).send();
+      return res.status(204).send();
     } catch (error) {
       console.error(
         "Ошибка удаления фотографии:",
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось удалить фотографию."
       });
@@ -1313,89 +1717,102 @@ app.delete(
    ОТПРАВКА МОЛИТВЕННОГО ЗАПРОСА
 ========================= */
 
-app.post("/api/prayer-requests", (req, res) => {
-  try {
-    const name = String(
-      req.body.name || ""
-    ).trim();
-
-    const contact = String(
-      req.body.contact || ""
-    ).trim();
-
-    const requestText = String(
-      req.body.request || ""
-    ).trim();
-
-    const anonymous =
-      req.body.anonymous === true;
-
-    if (requestText.length < 10) {
-      return res.status(400).json({
-        error:
-          "Молитвенный запрос должен содержать минимум 10 символов."
-      });
-    }
-
-    if (requestText.length > 2000) {
-      return res.status(400).json({
-        error:
-          "Молитвенный запрос слишком длинный."
-      });
-    }
-
-    const savedName = anonymous
-      ? ""
-      : name;
-
-    const result = db
-      .prepare(`
-        INSERT INTO prayer_requests (
-          name,
-          contact,
-          request_text,
-          anonymous,
-          status
+app.post(
+  "/api/prayer-requests",
+  (req, res) => {
+    try {
+      const name =
+        String(
+          req.body.name || ""
         )
-        VALUES (?, ?, ?, ?, 'new')
-      `)
-      .run(
-        savedName,
-        contact,
-        requestText,
-        anonymous ? 1 : 0
+          .trim()
+          .slice(0, 120);
+
+      const contact =
+        String(
+          req.body.contact || ""
+        )
+          .trim()
+          .slice(0, 200);
+
+      const requestText =
+        String(
+          req.body.request || ""
+        ).trim();
+
+      const anonymous =
+        req.body.anonymous === true;
+
+      if (requestText.length < 10) {
+        return res.status(400).json({
+          error:
+            "Молитвенный запрос должен содержать минимум 10 символов."
+        });
+      }
+
+      if (requestText.length > 2000) {
+        return res.status(400).json({
+          error:
+            "Молитвенный запрос слишком длинный."
+        });
+      }
+
+      const savedName =
+        anonymous ? "" : name;
+
+      const result = db
+        .prepare(`
+          INSERT INTO prayer_requests (
+            name,
+            contact,
+            request_text,
+            anonymous,
+            status
+          )
+          VALUES (?, ?, ?, ?, 'new')
+        `)
+        .run(
+          savedName,
+          contact,
+          requestText,
+          anonymous ? 1 : 0
+        );
+
+      const createdRequest = db
+        .prepare(`
+          SELECT *
+          FROM prayer_requests
+          WHERE id = ?
+        `)
+        .get(result.lastInsertRowid);
+
+      return res
+        .status(201)
+        .json({
+          message:
+            "Молитвенный запрос успешно отправлен.",
+
+          request:
+            normalizePrayerRequest(
+              createdRequest
+            )
+        });
+    } catch (error) {
+      console.error(
+        "Ошибка отправки молитвенного запроса:",
+        error
       );
 
-    const createdRequest = db
-      .prepare(`
-        SELECT *
-        FROM prayer_requests
-        WHERE id = ?
-      `)
-      .get(result.lastInsertRowid);
-
-    res.status(201).json({
-      message:
-        "Молитвенный запрос успешно отправлен.",
-      request: normalizePrayerRequest(
-        createdRequest
-      )
-    });
-  } catch (error) {
-    console.error(
-      "Ошибка отправки молитвенного запроса:",
-      error
-    );
-
-    res.status(500).json({
-      error:
-        "Не удалось отправить молитвенный запрос."
-    });
+      return res.status(500).json({
+        error:
+          "Не удалось отправить молитвенный запрос."
+      });
+    }
   }
-});
+);
 
 /* =========================
-   ЗАПРОСЫ В АДМИНКЕ
+   МОЛИТВЕННЫЕ ЗАПРОСЫ В АДМИНКЕ
 ========================= */
 
 app.get(
@@ -1408,7 +1825,8 @@ app.get(
           FROM prayer_requests
           ORDER BY
             CASE
-              WHEN status = 'new' THEN 0
+              WHEN status = 'new'
+              THEN 0
               ELSE 1
             END,
             created_at DESC,
@@ -1416,8 +1834,10 @@ app.get(
         `)
         .all();
 
-      res.json(
-        rows.map(normalizePrayerRequest)
+      return res.json(
+        rows.map(
+          normalizePrayerRequest
+        )
       );
     } catch (error) {
       console.error(
@@ -1425,7 +1845,7 @@ app.get(
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось загрузить молитвенные запросы."
       });
@@ -1434,7 +1854,7 @@ app.get(
 );
 
 /* =========================
-   ИЗМЕНЕНИЕ СТАТУСА
+   ИЗМЕНЕНИЕ СТАТУСА ЗАПРОСА
 ========================= */
 
 app.patch(
@@ -1445,9 +1865,14 @@ app.patch(
         Number(req.params.id);
 
       const status =
-        String(req.body.status || "");
+        String(
+          req.body.status || ""
+        ).trim();
 
-      if (!Number.isInteger(requestId)) {
+      if (
+        !Number.isInteger(requestId) ||
+        requestId <= 0
+      ) {
         return res.status(400).json({
           error:
             "Некорректный ID запроса."
@@ -1498,18 +1923,18 @@ app.patch(
         `)
         .get(requestId);
 
-      res.json(
+      return res.json(
         normalizePrayerRequest(
           updatedRequest
         )
       );
     } catch (error) {
       console.error(
-        "Ошибка изменения статуса:",
+        "Ошибка изменения статуса запроса:",
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось изменить статус запроса."
       });
@@ -1518,7 +1943,7 @@ app.patch(
 );
 
 /* =========================
-   УДАЛЕНИЕ ЗАПРОСА
+   УДАЛЕНИЕ МОЛИТВЕННОГО ЗАПРОСА
 ========================= */
 
 app.delete(
@@ -1528,7 +1953,10 @@ app.delete(
       const requestId =
         Number(req.params.id);
 
-      if (!Number.isInteger(requestId)) {
+      if (
+        !Number.isInteger(requestId) ||
+        requestId <= 0
+      ) {
         return res.status(400).json({
           error:
             "Некорректный ID запроса."
@@ -1549,14 +1977,14 @@ app.delete(
         });
       }
 
-      res.status(204).send();
+      return res.status(204).send();
     } catch (error) {
       console.error(
-        "Ошибка удаления запроса:",
+        "Ошибка удаления молитвенного запроса:",
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error:
           "Не удалось удалить молитвенный запрос."
       });
@@ -1565,289 +1993,754 @@ app.delete(
 );
 
 /* =========================
-   АНАЛИТИКА — ЗАПИСЬ ПРОСМОТРА
+   АНАЛИТИКА
 ========================= */
 
-app.post("/api/analytics/track", (req, res) => {
-  try {
-    const sessionId = String(
-      req.body.sessionId || ""
-    ).trim();
+app.post(
+  "/api/analytics/track",
+  (req, res) => {
+    try {
 
-    const pagePath = String(
-      req.body.pagePath || ""
-    ).trim();
+      const sessionId =
+        String(
+          req.body.sessionId || ""
+        ).trim();
 
-    const pageTitle = String(
-      req.body.pageTitle || ""
-    )
-      .trim()
-      .slice(0, 250);
+      const pagePath =
+        String(
+          req.body.pagePath || ""
+        ).trim();
 
-    const referrer = String(
-      req.body.referrer || ""
-    )
-      .trim()
-      .slice(0, 500);
+      const pageTitle =
+        String(
+          req.body.pageTitle || ""
+        )
+          .trim()
+          .slice(0, 250);
 
-    const allowedDevices = new Set([
-      "mobile",
-      "tablet",
-      "desktop"
-    ]);
+      const referrer =
+        String(
+          req.body.referrer || ""
+        )
+          .trim()
+          .slice(0, 500);
 
-    const requestedDevice = String(
-      req.body.deviceType || "desktop"
-    );
+      const allowedDevices =
+        new Set([
+          "desktop",
+          "mobile",
+          "tablet"
+        ]);
 
-    const deviceType =
-      allowedDevices.has(requestedDevice)
-        ? requestedDevice
-        : "desktop";
+      const deviceType =
+        allowedDevices.has(
+          req.body.deviceType
+        )
+          ? req.body.deviceType
+          : "desktop";
 
-    if (
-      !sessionId ||
-      sessionId.length > 120 ||
-      !pagePath ||
-      pagePath.length > 500
-    ) {
-      return res.status(400).json({
-        error:
-          "Некорректные данные аналитики."
-      });
-    }
+      if (
+        !sessionId ||
+        !pagePath
+      ) {
+        return res
+          .status(400)
+          .json({
+            error:
+              "Некорректные данные."
+          });
+      }
 
-    /*
-      Не учитываем страницы админки.
-    */
-    if (pagePath.startsWith("/admin/")) {
-      return res.status(204).send();
-    }
+      /*
+        Не считаем админку.
+      */
 
-    db.prepare(`
-      INSERT INTO analytics_pageviews (
-        session_id,
-        page_path,
-        page_title,
+      if (
+        pagePath.startsWith("/admin/")
+      ) {
+        return res
+          .status(204)
+          .send();
+      }
+
+      db.prepare(`
+        INSERT INTO analytics_pageviews (
+          session_id,
+          page_path,
+          page_title,
+          referrer,
+          device_type
+        )
+        VALUES (?, ?, ?, ?, ?)
+      `).run(
+        sessionId,
+        pagePath,
+        pageTitle,
         referrer,
-        device_type
-      )
-      VALUES (?, ?, ?, ?, ?)
-    `).run(
-      sessionId,
-      pagePath,
-      pageTitle,
-      referrer,
-      deviceType
-    );
+        deviceType
+      );
 
-    res.status(204).send();
-  } catch (error) {
-    console.error(
-      "Ошибка записи аналитики:",
-      error
-    );
+      return res
+        .status(204)
+        .send();
 
-    res.status(500).json({
-      error:
-        "Не удалось сохранить аналитику."
-    });
+    } catch (error) {
+
+      console.error(
+        "Ошибка аналитики:",
+        error
+      );
+
+      return res
+        .status(500)
+        .json({
+          error:
+            "Не удалось сохранить аналитику."
+        });
+
+    }
   }
-});
+);
 
 /* =========================
-   АНАЛИТИКА ДЛЯ АДМИНКИ
+   СВОДНАЯ АНАЛИТИКА
 ========================= */
 
 app.get(
   "/api/admin/analytics/summary",
   (req, res) => {
+
     try {
-      const todaySummary = db
-        .prepare(`
+
+      const today =
+        db.prepare(`
           SELECT
+
             COUNT(*) AS pageviews,
-            COUNT(DISTINCT session_id) AS visitors
-          FROM analytics_pageviews
-          WHERE DATE(created_at, 'localtime') =
-                DATE('now', 'localtime')
-        `)
-        .get();
 
-      const onlineSummary = db
-        .prepare(`
-          SELECT
-            COUNT(DISTINCT session_id) AS online
-          FROM analytics_pageviews
-          WHERE datetime(created_at) >=
-                datetime('now', '-5 minutes')
-        `)
-        .get();
+            COUNT(
+              DISTINCT session_id
+            ) AS visitors
 
-      const totalSummary = db
-        .prepare(`
+          FROM analytics_pageviews
+
+          WHERE DATE(
+            created_at,
+            'localtime'
+          ) =
+          DATE(
+            'now',
+            'localtime'
+          )
+        `).get();
+
+      const online =
+        db.prepare(`
           SELECT
+
+            COUNT(
+              DISTINCT session_id
+            ) AS online
+
+          FROM analytics_pageviews
+
+          WHERE datetime(
+            created_at
+          ) >= datetime(
+            'now',
+            '-5 minutes'
+          )
+        `).get();
+
+      const total =
+        db.prepare(`
+          SELECT
+
             COUNT(*) AS pageviews,
-            COUNT(DISTINCT session_id) AS visitors
-          FROM analytics_pageviews
-        `)
-        .get();
 
-      const devices = db
-        .prepare(`
+            COUNT(
+              DISTINCT session_id
+            ) AS visitors
+
+          FROM analytics_pageviews
+        `).get();
+
+      const devices =
+        db.prepare(`
           SELECT
+
             device_type AS device,
+
             COUNT(*) AS views
+
           FROM analytics_pageviews
-          WHERE datetime(created_at) >=
-                datetime('now', '-30 days')
+
+          WHERE datetime(
+            created_at
+          ) >= datetime(
+            'now',
+            '-30 days'
+          )
+
           GROUP BY device_type
-          ORDER BY views DESC
-        `)
-        .all();
 
-      const topPages = db
-        .prepare(`
+          ORDER BY views DESC
+        `).all();
+
+      const topPages =
+        db.prepare(`
           SELECT
+
             page_path AS path,
-            MAX(page_title) AS title,
+
+            MAX(page_title)
+              AS title,
+
             COUNT(*) AS views,
-            COUNT(DISTINCT session_id) AS visitors
+
+            COUNT(
+              DISTINCT session_id
+            ) AS visitors
+
           FROM analytics_pageviews
-          WHERE datetime(created_at) >=
-                datetime('now', '-30 days')
+
           GROUP BY page_path
+
           ORDER BY views DESC
+
           LIMIT 10
-        `)
-        .all();
+        `).all();
 
-      const visitsByDay = db
-        .prepare(`
+      const visitsByDay =
+        db.prepare(`
           SELECT
-            DATE(created_at, 'localtime') AS date,
-            COUNT(*) AS pageviews,
-            COUNT(DISTINCT session_id) AS visitors
-          FROM analytics_pageviews
-          WHERE datetime(created_at) >=
-                datetime('now', '-29 days')
-          GROUP BY DATE(created_at, 'localtime')
-          ORDER BY date ASC
-        `)
-        .all();
 
-      res.json({
+            DATE(
+              created_at,
+              'localtime'
+            ) AS date,
+
+            COUNT(*) AS pageviews,
+
+            COUNT(
+              DISTINCT session_id
+            ) AS visitors
+
+          FROM analytics_pageviews
+
+          WHERE datetime(
+            created_at
+          ) >= datetime(
+            'now',
+            '-29 days'
+          )
+
+          GROUP BY DATE(
+            created_at,
+            'localtime'
+          )
+
+          ORDER BY date ASC
+        `).all();
+
+      return res.json({
+
         today: {
+
           visitors:
-            Number(todaySummary.visitors) || 0,
+            Number(
+              today.visitors
+            ) || 0,
 
           pageviews:
-            Number(todaySummary.pageviews) || 0,
+            Number(
+              today.pageviews
+            ) || 0,
 
           online:
-            Number(onlineSummary.online) || 0
+            Number(
+              online.online
+            ) || 0
+
         },
 
         total: {
+
           visitors:
-            Number(totalSummary.visitors) || 0,
+            Number(
+              total.visitors
+            ) || 0,
 
           pageviews:
-            Number(totalSummary.pageviews) || 0
+            Number(
+              total.pageviews
+            ) || 0
+
         },
 
-        devices: devices.map((item) => ({
-          device: item.device,
-          views: Number(item.views) || 0
-        })),
+        devices:
+          devices.map(
+            device => ({
 
-        topPages: topPages.map((item) => ({
-          path: item.path,
-          title: item.title,
-          views: Number(item.views) || 0,
-          visitors:
-            Number(item.visitors) || 0
-        })),
+              device:
+                device.device,
 
-        visitsByDay: visitsByDay.map(
-          (item) => ({
-            date: item.date,
-            pageviews:
-              Number(item.pageviews) || 0,
+              views:
+                Number(
+                  device.views
+                ) || 0
 
-            visitors:
-              Number(item.visitors) || 0
-          })
-        )
+            })
+          ),
+
+        topPages:
+          topPages.map(
+            page => ({
+
+              path:
+                page.path,
+
+              title:
+                page.title,
+
+              views:
+                Number(
+                  page.views
+                ) || 0,
+
+              visitors:
+                Number(
+                  page.visitors
+                ) || 0
+
+            })
+          ),
+
+        visitsByDay:
+          visitsByDay.map(
+            day => ({
+
+              date:
+                day.date,
+
+              pageviews:
+                Number(
+                  day.pageviews
+                ) || 0,
+
+              visitors:
+                Number(
+                  day.visitors
+                ) || 0
+
+            })
+          )
+
       });
+
     } catch (error) {
+
       console.error(
-        "Ошибка загрузки аналитики:",
+        "Ошибка аналитики:",
         error
       );
 
-      res.status(500).json({
-        error:
-          "Не удалось загрузить аналитику."
-      });
+      return res
+        .status(500)
+        .json({
+          error:
+            "Не удалось загрузить аналитику."
+        });
+
     }
+
   }
 );
+
 /* =========================
-   ОБРАБОТКА ОШИБОК ЗАГРУЗКИ
+   РЕЗЕРВНЫЕ КОПИИ БАЗЫ
 ========================= */
 
-app.use((error, req, res, next) => {
-  if (
-    error instanceof
-    multer.MulterError
-  ) {
+const databaseFilePath =
+  path.join(__dirname, "church.db");
+
+const backupsDirectory =
+  path.join(__dirname, "backups");
+
+const BACKUP_INTERVAL_MS =
+  24 * 60 * 60 * 1000;
+
+const BACKUP_RETENTION_DAYS = 30;
+
+fs.mkdirSync(backupsDirectory, {
+  recursive: true
+});
+
+function padDatePart(value) {
+  return String(value).padStart(2, "0");
+}
+
+function createBackupFilename(date) {
+  const year =
+    date.getFullYear();
+
+  const month =
+    padDatePart(date.getMonth() + 1);
+
+  const day =
+    padDatePart(date.getDate());
+
+  const hours =
+    padDatePart(date.getHours());
+
+  const minutes =
+    padDatePart(date.getMinutes());
+
+  const seconds =
+    padDatePart(date.getSeconds());
+
+  return (
+    `church-${year}-${month}-${day}` +
+    `_${hours}-${minutes}-${seconds}.db`
+  );
+}
+
+async function createDatabaseBackup() {
+  try {
+    if (!fs.existsSync(databaseFilePath)) {
+      console.warn(
+        "Резервная копия не создана: " +
+        "файл church.db не найден."
+      );
+
+      return;
+    }
+
+    const backupFilename =
+      createBackupFilename(new Date());
+
+    const backupPath =
+      path.join(
+        backupsDirectory,
+        backupFilename
+      );
+
+    /*
+      SQLite backup API создаёт согласованную
+      копию даже во время работы базы.
+    */
+    await db.backup(backupPath);
+
+    console.log(
+      `Резервная копия создана: ${backupFilename}`
+    );
+
+    cleanupOldBackups();
+  } catch (error) {
+    console.error(
+      "Ошибка создания резервной копии:",
+      error
+    );
+  }
+}
+
+function cleanupOldBackups() {
+  try {
+    const files =
+      fs.readdirSync(
+        backupsDirectory,
+        {
+          withFileTypes: true
+        }
+      );
+
+    const expirationTime =
+      Date.now() -
+      BACKUP_RETENTION_DAYS *
+      24 *
+      60 *
+      60 *
+      1000;
+
+    files.forEach((entry) => {
+      if (
+        !entry.isFile() ||
+        !entry.name.endsWith(".db")
+      ) {
+        return;
+      }
+
+      const filePath =
+        path.join(
+          backupsDirectory,
+          entry.name
+        );
+
+      const stats =
+        fs.statSync(filePath);
+
+      if (
+        stats.mtimeMs <
+        expirationTime
+      ) {
+        fs.unlinkSync(filePath);
+
+        console.log(
+          `Старая копия удалена: ${entry.name}`
+        );
+      }
+    });
+  } catch (error) {
+    console.error(
+      "Ошибка очистки резервных копий:",
+      error
+    );
+  }
+}
+
+/* =========================
+   ПРОВЕРКА РАБОТЫ СЕРВЕРА
+========================= */
+
+app.get(
+  "/api/health",
+  (req, res) => {
+    return res.json({
+      status: "ok",
+      time: new Date().toISOString()
+    });
+  }
+);
+
+/* =========================
+   ОБРАБОТКА НЕИЗВЕСТНЫХ API
+========================= */
+
+app.use(
+  "/api",
+  (req, res) => {
+    return res.status(404).json({
+      error:
+        "Запрашиваемый API-адрес не найден."
+    });
+  }
+);
+
+/* =========================
+   ОБРАБОТКА ОШИБОК
+========================= */
+
+app.use(
+  (error, req, res, next) => {
     if (
-      error.code ===
-      "LIMIT_FILE_SIZE"
+      error instanceof
+      multer.MulterError
+    ) {
+      if (
+        error.code ===
+        "LIMIT_FILE_SIZE"
+      ) {
+        return res.status(400).json({
+          error:
+            "Фотография слишком большая. " +
+            "Максимальный размер — 5 МБ."
+        });
+      }
+
+      if (
+        error.code ===
+        "LIMIT_FILE_COUNT"
+      ) {
+        return res.status(400).json({
+          error:
+            "Можно загрузить максимум " +
+            "20 фотографий за один раз."
+        });
+      }
+
+      if (
+        error.code ===
+        "LIMIT_UNEXPECTED_FILE"
+      ) {
+        return res.status(400).json({
+          error:
+            "Получено неожиданное поле файла."
+        });
+      }
+
+      console.error(
+        "Ошибка Multer:",
+        error
+      );
+
+      return res.status(400).json({
+        error:
+          "Не удалось загрузить фотографию."
+      });
+    }
+
+    if (
+      error?.message ===
+      "Разрешены только JPG, PNG и WEBP."
+    ) {
+      return res.status(400).json({
+        error: error.message
+      });
+    }
+
+    if (
+      error?.type ===
+      "entity.too.large"
+    ) {
+      return res.status(413).json({
+        error:
+          "Отправленные данные слишком большие."
+      });
+    }
+
+    if (
+      error instanceof SyntaxError &&
+      error.status === 400 &&
+      "body" in error
     ) {
       return res.status(400).json({
         error:
-          "Фотография слишком большая. Максимум 5 МБ."
+          "Сервер получил некорректный JSON."
       });
     }
 
-    return res.status(400).json({
+    console.error(
+      "Необработанная ошибка сервера:",
+      error
+    );
+
+    return res.status(500).json({
       error:
-        "Ошибка загрузки фотографии."
+        "Внутренняя ошибка сервера."
     });
   }
-
-  if (
-    error?.message ===
-    "Разрешены только JPG, PNG и WEBP."
-  ) {
-    return res.status(400).json({
-      error: error.message
-    });
-  }
-
-  console.error(
-    "Необработанная ошибка:",
-    error
-  );
-
-  res.status(500).json({
-    error:
-      "Внутренняя ошибка сервера."
-  });
-});
+);
 
 /* =========================
    ЗАПУСК СЕРВЕРА
 ========================= */
 
-app.listen(PORT, () => {
+const server = app.listen(
+  PORT,
+  () => {
+    console.log(
+      `Сайт запущен: http://localhost:${PORT}`
+    );
+
+    console.log(
+      `Админка: http://localhost:${PORT}/admin/login.html`
+    );
+
+    console.log(
+      `Проверка сервера: http://localhost:${PORT}/api/health`
+    );
+
+    /*
+      Создаём резервную копию
+      после запуска сервера.
+    */
+    createDatabaseBackup();
+
+    /*
+      Затем создаём копию
+      один раз каждые 24 часа.
+    */
+    setInterval(
+      createDatabaseBackup,
+      BACKUP_INTERVAL_MS
+    ).unref();
+  }
+);
+
+/* =========================
+   КОРРЕКТНОЕ ЗАВЕРШЕНИЕ
+========================= */
+
+function shutdownServer(signal) {
   console.log(
-    `Сайт запущен: http://localhost:${PORT}`
+    `Получен сигнал ${signal}. Завершаем работу...`
   );
 
-  console.log(
-    `Админка: http://localhost:${PORT}/admin/login.html`
-  );
-});
+  server.close(async () => {
+    try {
+      /*
+        Создаём последнюю копию
+        перед остановкой сервера.
+      */
+      await createDatabaseBackup();
+
+      sessionsDatabase.close();
+
+      /*
+        Основную базу закрываем,
+        если объект поддерживает close().
+      */
+      if (
+        db &&
+        typeof db.close === "function"
+      ) {
+        db.close();
+      }
+
+      console.log(
+        "Сервер и базы данных закрыты."
+      );
+
+      process.exit(0);
+    } catch (error) {
+      console.error(
+        "Ошибка при завершении сервера:",
+        error
+      );
+
+      process.exit(1);
+    }
+  });
+
+  /*
+    Если сервер завис, принудительно
+    завершаем процесс через 10 секунд.
+  */
+  setTimeout(() => {
+    console.error(
+      "Принудительное завершение сервера."
+    );
+
+    process.exit(1);
+  }, 10000).unref();
+}
+
+process.on(
+  "SIGINT",
+  () => shutdownServer("SIGINT")
+);
+
+process.on(
+  "SIGTERM",
+  () => shutdownServer("SIGTERM")
+);
+
+process.on(
+  "unhandledRejection",
+  (reason) => {
+    console.error(
+      "Необработанный Promise:",
+      reason
+    );
+  }
+);
+
+process.on(
+  "uncaughtException",
+  (error) => {
+    console.error(
+      "Необработанная ошибка Node.js:",
+      error
+    );
+  }
+);

@@ -34,6 +34,8 @@ document.getElementById(
 "analyticsChart"
 );
 
+AdminAuth.requireAdminSession();
+
 /* =========================
    SIDEBAR
 ========================= */
@@ -52,6 +54,7 @@ const adminSidebarOverlay =
 
 const adminLogoutButton =
   document.getElementById("adminLogoutButton");
+
 
 function openAdminSidebar() {
   adminSidebar?.classList.add("active");
@@ -89,11 +92,7 @@ adminSidebarOverlay?.addEventListener(
 adminLogoutButton?.addEventListener(
   "click",
   () => {
-    sessionStorage.removeItem(
-      "temporaryAdminAccess"
-    );
-
-    window.location.href = "login.html";
+    AdminAuth.logoutAdmin();
   }
 );
 

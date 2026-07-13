@@ -61,10 +61,13 @@ adminSidebarOverlay?.addEventListener(
   closeAdminSidebar
 );
 
-adminLogoutButton?.addEventListener("click", () => {
-  sessionStorage.removeItem("temporaryAdminAccess");
-  window.location.href = "login.html";
-});
+adminLogoutButton?.addEventListener(
+  "click",
+  () => {
+    AdminAuth.logoutAdmin();
+  }
+);
+AdminAuth.requireAdminSession();
 
 /* =========================
    ЭЛЕМЕНТЫ СТРАНИЦЫ
